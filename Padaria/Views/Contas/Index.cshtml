@@ -1,0 +1,65 @@
+﻿@model Padaria.Models.ViewModels.ProdutoFormViewModel
+
+@{
+    ViewData["Title"] = "Atendimento";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+
+<form asp-action="Index">
+
+    @if(Model != null){
+    @for (int i = 0; i < Model.Produtos.Count; i++)
+    {
+        <tr>
+            <td>
+                <input type="hidden" name="[@i].Quantidade" value="@Model.Produtos[i].Quantidade" class="form-control form-control-sm" style="width: 60px;" />
+            </td>
+            <td>
+                
+                <input type="hidden" name="[@i].Produto.Nome" value="@Model.Produtos[i].Produto.Nome" />
+
+                <input type="hidden" name="[@i].Produto.Codigo" value="@Model.Produtos[i].Produto.Codigo" />
+
+            </td>
+            <td>
+                
+                <input type="hidden" name="[@i].Produto.Preco" value="@Model.Produtos[i].Produto.Preco" />
+
+
+            </td>
+        </tr>
+    }
+    <input type="hidden" name="Conta.ValorTotal" value="@Model.ValorTotal()" />
+    <input type="hidden" name="Conta.Data" value="@DateTime.Now" />
+
+
+        <h1>Valor Total: R$ @Model.ValorTotal().ToString("F2")</h1>
+        <label>Valor Recebido: </label>
+        <input type="text" name="valorRecebido" value="0,00" autofocus onselect=""/>
+        <h2>Troco: @Model.Troco.ToString("F2")</h2>
+
+
+        <button type="submit" value="Finalizar" class="btn btn-info"></button>
+    }
+
+</form>
+
+@section Scripts {
+
+
+    
+
+
+
+    
+     
+    <script src="@Url.Content("~/js/jquery.validate.pt-BR.js")"></script>
+
+}
+    
+
+
+
+

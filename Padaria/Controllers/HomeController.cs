@@ -18,30 +18,49 @@ namespace Padaria.Controllers
 
         public IActionResult Index()
         {
-            List<Produto> produtos = null;
+            List<ProdutosConta> produtos = null;
             return View(produtos);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Index(List<Produto> p, string codigo)
+        public IActionResult Index(List<ProdutosConta> p, string? codigo)
         {
-            Produto produto = _context.Produto.FirstOrDefault(p => p.Codigo.Equals(codigo));
-            if (produto == null)
+            if (codigo != null)
             {
-                return NotFound();
+                Produto produto = _context.Produto.FirstOrDefault(p => p.Codigo.Equals(codigo));
+                if (produto == null)
+                {
+                    return NotFound();
+                }
+
+                ProdutosConta pc = new ProdutosConta { Produto = produto, Quantidade = 4 };
+                p.Add(pc);
+                 
+            }
+            foreach (var item in p)
+            {
+                if (item.Quantidade == 0)
+                {
+                    p.Remove(item);
+               
+                    break;
+                }
             }
 
-            if (p == null)
-            {
-                List<Produto> produtosT = new List<Produto>();
-                produtosT.Add(produto);
-                return View(produtosT);
-            }
+                ProdutoFormViewModel pf = new ProdutoFormViewModel { Produtos = p };
 
-            p.Add(produto);
+                return View(pf);
 
-            return View(p);
+            
+        }
+
+        
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Finalizar(){
+
+            return View();
             
         }
 

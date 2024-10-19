@@ -1,40 +1,87 @@
-﻿@model List<Produto>
+﻿@model Padaria.Models.ViewModels.ProdutoFormViewModel
 
 @{
     ViewData["Title"] = "Home Page";
+    
+    
 }
+
+
 
 <form asp-action="Index">
 
 <div class="row mb-4">
     <label for="codigo" class="col-sm-2 col-form-label">codigo</label>
     <div class="col-sm-10">
-        <input type="text" name="codigo" class="form-control" />
+            <input type="text" name="codigo" class="form-control" autofocus />
     </div>
         
 </div>
 
+
     @if(Model != null){
-    @for (int i = 0; i < Model.Count; i++)
-    {
-        <div>
-            <input type="hidden" name="[@i].Id" value="@Model[i].Id" />
-            <input type="text" name="[@i].Nome" value="@Model[i].Nome" />
-        </div>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Quantidade</th>
+                    <th>Produto</th>
+                    <th>Valor</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                @for (int i = 0; i < Model.Produtos.Count; i++)
+                {
+                    <tr>
+                        <td>
+                            <input type="number" name="[@i].Quantidade" value="@Model.Produtos[i].Quantidade" class="form-control form-control-sm" style="width: 60px;" />
+                        </td>
+                        <td>
+                            <input type="hidden" name="[@i].Produto.Codigo" value="@Model.Produtos[i].Produto.Codigo" />
+                        </td>
+                        <td>
+                            <label class="col-form-label">@Model.Produtos[i].Produto.Nome</label>
+                            <input type="hidden" name="[@i].Produto.Nome" value="@Model.Produtos[i].Produto.Nome" />
+                        </td>
+                        <td>
+                            <label class="col-form-label">@Model.Produtos[i].Total().ToString("F2")</label>
+                            <input type="hidden" name="[@i].Produto.Preco" value="@Model.Produtos[i].Produto.Preco" />
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <footer>
+            <label for="Valor" class="col-sm-2 col-form-label">@Model.ValorTotal().ToString("F2")</label>
+        </footer>
+
+        
     }
-    }
+
+
 
     <button type="submit" value="Create" class="btn btn-primary"></button>
+    <button type="" formaction="@Url.Action("Index", "Contas")" class="btn btn-secondary" id="btnFinalizar">Finalizar</button>
 </form>
 
-@if(Model != null){
-@foreach(var item in Model)
-{
-    <tr>
-    <td>
-    @Html.DisplayFor(modelItem => item.Nome)
-    </td>
-        </tr>
-}
+
+@section Scripts {
+
+    <script>
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'F1') {
+                event.preventDefault(); // Evita que a ajuda padrão do navegador seja exibida
+                document.getElementById('btnFinalizar').click(); // Simula o clique no botão "Finalizar"
+            }
+        });
+    </script>
+
+
+
 }
 
+
+
+    

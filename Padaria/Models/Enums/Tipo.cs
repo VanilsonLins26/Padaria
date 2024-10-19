@@ -2,8 +2,8 @@
 {
     public enum Tipo : int
     {
-        Kg = 0,
-        Unidade = 1,
+        Unidade = 0,
+        Kg = 1,
 
     }
 }

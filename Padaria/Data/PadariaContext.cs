@@ -22,9 +22,12 @@ using Padaria.Models;
         {
             foreignKey.DeleteBehavior = DeleteBehavior.Restrict;
         }
-    }
 
-public DbSet<Padaria.Models.Cliente> Cliente { get; set; } = default!;
+        
+    }
+   
+
+    public DbSet<Padaria.Models.Cliente> Cliente { get; set; } = default!;
 }
 
 
