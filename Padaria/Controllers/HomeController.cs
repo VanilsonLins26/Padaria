@@ -34,7 +34,7 @@ namespace Padaria.Controllers
                     return NotFound();
                 }
 
-                ProdutosConta pc = new ProdutosConta { Produto = produto, Quantidade = 4 };
+                ProdutosConta pc = new ProdutosConta { Produto = produto, Quantidade = 1, Total = produto.Preco };
                 p.Add(pc);
                  
             }

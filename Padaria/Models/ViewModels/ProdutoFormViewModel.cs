@@ -8,12 +8,17 @@
 
 
 
+        public double ValorTotalProduto(int i)
+        {
+            return Produtos[i].Quantidade * Produtos[i].Produto.Preco ;
+        }
+
         public double ValorTotal()
         {
             double valor = 0;
-            foreach (var item in Produtos)
+            for(int i = 0; i <Produtos.Count; i++)
             {
-                valor += item.Total();
+                valor += ValorTotalProduto(i);
             }
             return valor;
         }

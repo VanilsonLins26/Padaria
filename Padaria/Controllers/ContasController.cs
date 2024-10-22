@@ -17,30 +17,45 @@ namespace Padaria.Controllers
 
         public IActionResult Index()
         {
+           var contas = _context.Conta.ToList();
+            return View(contas);
+        }
+
+        public IActionResult Create()
+        {
            
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Index(List<ProdutosConta> p, Conta conta, string valorRecebido)
+        public IActionResult Create(List<ProdutosConta> p, Conta conta, string valorRecebido)
         {
             double vr = 0;
             if (valorRecebido != null)
             {
                 vr = double.Parse(valorRecebido);
                  double.Parse(valorRecebido);
-                if (conta.ValorTotal > 0 && vr == 0)
+                if (conta.ValorTotal > 0 && vr == conta.ValorTotal)
                 {
 
-                    _context.Add(conta);
+                    
                     foreach (var item in p)
                     {
-                        item.Conta = conta;
-                        _context.Add(item);
+                        var produto = _context.Produto.FirstOrDefault(pr => pr.Id == item.Produto.Id);
+
+                        if (produto != null)
+                        {
+                            var pc = new ProdutosConta { Produto = produto, Quantidade = item.Quantidade, Conta = conta, Total = item.Total};
+                            conta.Produtos.Add(pc);
+                            _context.Add(conta);
+                        }
+                        
+                        
 
                     }
                     _context.SaveChanges();
+
                     return RedirectToAction("Index", "Home");
                 }
             }
@@ -48,5 +63,13 @@ namespace Padaria.Controllers
             ProdutoFormViewModel pf = new ProdutoFormViewModel { Produtos = p, Troco = troco };  
             return View(pf);
         }
+        public IActionResult Details(int? id)
+        {
+           var conta = _context.Conta.Include(c => c.Produtos).ThenInclude(c => c.Produto).FirstOrDefault(c => c.Id == id);
+
+            return View(conta);
+        }
     }
+
+   
 }

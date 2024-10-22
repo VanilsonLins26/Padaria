@@ -1,65 +1,44 @@
-﻿@model Padaria.Models.ViewModels.ProdutoFormViewModel
+﻿@model IEnumerable<Conta>
+
 
 @{
-    ViewData["Title"] = "Atendimento";
+    ViewData["Title"] = "Contas";
 }
 
 <h1>@ViewData["Title"]</h1>
 
+<table class="table table-striped table-hover">
+    <thead>
+        <tr class="table-dark">
+            <th>
+                @Html.DisplayNameFor(model => model.Id)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Data)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ValorTotal)
+            </th>
 
-<form asp-action="Index">
-
-    @if(Model != null){
-    @for (int i = 0; i < Model.Produtos.Count; i++)
-    {
-        <tr>
-            <td>
-                <input type="hidden" name="[@i].Quantidade" value="@Model.Produtos[i].Quantidade" class="form-control form-control-sm" style="width: 60px;" />
-            </td>
-            <td>
-                
-                <input type="hidden" name="[@i].Produto.Nome" value="@Model.Produtos[i].Produto.Nome" />
-
-                <input type="hidden" name="[@i].Produto.Codigo" value="@Model.Produtos[i].Produto.Codigo" />
-
-            </td>
-            <td>
-                
-                <input type="hidden" name="[@i].Produto.Preco" value="@Model.Produtos[i].Produto.Preco" />
-
-
-            </td>
+           
         </tr>
-    }
-    <input type="hidden" name="Conta.ValorTotal" value="@Model.ValorTotal()" />
-    <input type="hidden" name="Conta.Data" value="@DateTime.Now" />
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.Id">@Html.DisplayFor(modelItem => item.Id)</a>
 
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Data)
+                </td>
+                <td>
+                     @Html.DisplayFor(modelItem => item.ValorTotal)
+                </td>
 
-        <h1>Valor Total: R$ @Model.ValorTotal().ToString("F2")</h1>
-        <label>Valor Recebido: </label>
-        <input type="text" name="valorRecebido" value="0,00" autofocus onselect=""/>
-        <h2>Troco: @Model.Troco.ToString("F2")</h2>
-
-
-        <button type="submit" value="Finalizar" class="btn btn-info"></button>
-    }
-
-</form>
-
-@section Scripts {
-
-
-    
-
-
-
-    
-     
-    <script src="@Url.Content("~/js/jquery.validate.pt-BR.js")"></script>
-
-}
-    
-
-
-
-
+            </tr>
+        }
+    </tbody>
+</table>

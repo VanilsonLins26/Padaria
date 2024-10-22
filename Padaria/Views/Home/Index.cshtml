@@ -39,14 +39,18 @@
                         </td>
                         <td>
                             <input type="hidden" name="[@i].Produto.Codigo" value="@Model.Produtos[i].Produto.Codigo" />
-                        </td>
-                        <td>
-                            <label class="col-form-label">@Model.Produtos[i].Produto.Nome</label>
+                            <input type="hidden" name="[@i].Produto.Id" value="@Model.Produtos[i].Produto.Id" />
                             <input type="hidden" name="[@i].Produto.Nome" value="@Model.Produtos[i].Produto.Nome" />
                         </td>
                         <td>
-                            <label class="col-form-label">@Model.Produtos[i].Total().ToString("F2")</label>
+                            <label class="col-form-label">@Model.Produtos[i].Produto.Nome</label>
+                            
+                        </td>
+                        <td>
+                            <label class="col-form-label">R$ @Model.ValorTotalProduto(i).ToString("F2")</label>
+                            <input type="hidden" name="[@i].Produtos.Total" value="@Model.ValorTotalProduto(i)" />
                             <input type="hidden" name="[@i].Produto.Preco" value="@Model.Produtos[i].Produto.Preco" />
+                            
                         </td>
                     </tr>
                 }
@@ -63,7 +67,7 @@
 
 
     <button type="submit" value="Create" class="btn btn-primary"></button>
-    <button type="" formaction="@Url.Action("Index", "Contas")" class="btn btn-secondary" id="btnFinalizar">Finalizar</button>
+    <button type="" formaction="@Url.Action("Create", "Contas")" class="btn btn-secondary" id="btnFinalizar">Finalizar</button>
 </form>
 
 

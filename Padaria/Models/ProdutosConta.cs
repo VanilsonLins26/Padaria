@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Numerics;
 
 namespace Padaria.Models
 {
@@ -6,25 +7,26 @@ namespace Padaria.Models
     {
         public int Id { get; set; }
         public int? ContaId { get; set; }
+        public int ProdutoId { get; set; }
         public Produto Produto { get; set; }
         public int Quantidade { get; set; }
         public virtual Conta Conta { get; set; }
-        
+        [DataType(DataType.Currency)]
+        [Display(Name="Valor")]
+        public double Total { get; set; }
+
 
         public ProdutosConta() { }
 
-        public ProdutosConta(int id, Produto produto, int quantidade, Conta conta)
+        public ProdutosConta(int id, Produto produto, int quantidade, Conta conta, double total)
         {
             Produto = produto;
             Quantidade = quantidade;
             Conta = conta;
             Id = id;
-        }
-
-        public double Total()
-        {
-            double t =Quantidade * Produto.Preco;
-            return t;
+            Total = total;
         }
     }
+
+       
 }
