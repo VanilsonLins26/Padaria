@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Padaria.Models.Enums;
+using System.ComponentModel.DataAnnotations;
 using System.Net;
 
 namespace Padaria.Models
@@ -7,12 +8,13 @@ namespace Padaria.Models
     {
         public int Id { get; set; }
         public DateTime Data { get; set; }
-        public ICollection<ProdutosConta> Produtos  { get; set; } = new List<ProdutosConta>();  
+        public ICollection<ProdutoConta> Produtos  { get; set; } = new List<ProdutoConta>();  
         public Encomenda? Encomenda { get; set; }
 
         [Display(Name ="Valor Total")]
         [DataType(DataType.Currency)]
         public double ValorTotal { get; set; }
+        public MetodoPagamento MetodoPagamento { get; set; }
 
         public Conta() { }
 
@@ -20,11 +22,11 @@ namespace Padaria.Models
         {
             Data = data;
         }
-        public Conta(int id, DateTime data)
+        public Conta(int id, DateTime data, MetodoPagamento metodoPagamento)
         {
             Data = data;
             Id = id;
-
+            MetodoPagamento = metodoPagamento;
 
         }
 

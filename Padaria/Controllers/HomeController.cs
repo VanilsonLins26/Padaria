@@ -2,72 +2,91 @@ using Microsoft.AspNetCore.Mvc;
 using Padaria.Models;
 using System.Diagnostics;
 using Padaria.Models.ViewModels;
+using Padaria.Models.Enums;
+using Padaria.Services;
 
 namespace Padaria.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly ProdutoContaService _produtoContaService;
         private readonly PadariaContext _context;
 
-        public HomeController(ILogger<HomeController> logger, PadariaContext context)
+        public HomeController( PadariaContext context, ProdutoContaService produtoContaService)
         {
-            _logger = logger;
+            
             _context = context;
+            _produtoContaService = produtoContaService;
         }
 
         public IActionResult Index()
         {
-            List<ProdutosConta> produtos = null;
-            return View(produtos);
+            
+            return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Index(List<ProdutosConta> p, string? codigo)
+        public async Task<IActionResult> Index(List<ProdutoConta>? p, string? codigo)
         {
+
+            if (!ModelState.IsValid)
+            {
+                
+                return View();
+            }
+
             if (codigo != null)
             {
-                Produto produto = _context.Produto.FirstOrDefault(p => p.Codigo.Equals(codigo));
+
+
+                var produto = await _produtoContaService.FindByCodeAsync(codigo);
                 if (produto == null)
                 {
                     return NotFound();
                 }
 
-                ProdutosConta pc = new ProdutosConta { Produto = produto, Quantidade = 1, Total = produto.Preco };
+
+
+                ProdutoConta pc = new ProdutoConta { Produto = produto, Quantidade = 1, Total = produto.Preco };
+
                 p.Add(pc);
-                 
-            }
-            foreach (var item in p)
-            {
-                if (item.Quantidade == 0)
-                {
-                    p.Remove(item);
-               
-                    break;
-                }
+
+
+
+
             }
 
+            foreach (var item in p)
+                {
+                
+                if (item.Quantidade == 0)
+                    {
+                        p.Remove(item);
+
+                        break;
+                    }
+                var valor = _produtoContaService.ValorTotalProduto(item);
+                item.Total = valor;
+            }
+
+                var mp = new List<MetodoPagamento>();
+
                 ProdutoFormViewModel pf = new ProdutoFormViewModel { Produtos = p };
+
+            var valorTotal = _produtoContaService.ValorTotal(p);
+            ViewBag.Total = valorTotal; 
+
 
                 return View(pf);
 
             
-        }
-
-        
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult Finalizar(){
-
-            return View();
             
         }
 
-        public IActionResult Privacy()
-        {
-            return View();
-        }
+        
+
+      
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

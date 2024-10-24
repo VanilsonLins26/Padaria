@@ -15,7 +15,7 @@ namespace Padaria.Models
         [DataType(DataType.Currency)]
         public double Preco { get; set; }
         public Tipo Tipo { get; set; }
-        public ICollection<ProdutosConta> ?Produtos { get; set; }
+        public ICollection<ProdutoConta>? Produtos { get; set; }
 
         public Produto() { }
 

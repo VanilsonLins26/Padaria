@@ -17,28 +17,20 @@ namespace Padaria.Controllers
 
         public IActionResult Index()
         {
-           var contas = _context.Conta.ToList();
+           var contas = _context.Conta.OrderByDescending(c => c.Data).ToList();
             return View(contas);
         }
 
-        public IActionResult Create()
-        {
-           
-            return View();
-        }
+
+
+       
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(List<ProdutosConta> p, Conta conta, string valorRecebido)
+        public IActionResult Create(List<ProdutoConta> p, Conta conta)
         {
-            double vr = 0;
-            if (valorRecebido != null)
-            {
-                vr = double.Parse(valorRecebido);
-                 double.Parse(valorRecebido);
-                if (conta.ValorTotal > 0 && vr == conta.ValorTotal)
-                {
-
+            
+                
                     
                     foreach (var item in p)
                     {
@@ -46,7 +38,7 @@ namespace Padaria.Controllers
 
                         if (produto != null)
                         {
-                            var pc = new ProdutosConta { Produto = produto, Quantidade = item.Quantidade, Conta = conta, Total = item.Total};
+                            var pc = new ProdutoConta { Produto = produto, Quantidade = item.Quantidade, Conta = conta, Total = item.Total};
                             conta.Produtos.Add(pc);
                             _context.Add(conta);
                         }
@@ -57,12 +49,29 @@ namespace Padaria.Controllers
                     _context.SaveChanges();
 
                     return RedirectToAction("Index", "Home");
-                }
-            }
-            double troco = vr - conta.ValorTotal;
-            ProdutoFormViewModel pf = new ProdutoFormViewModel { Produtos = p, Troco = troco };  
-            return View(pf);
+                
+ 
         }
+
+        public IActionResult UnicSearch(DateTime data)
+        {
+            var contas = _context.Conta.Where(c => c.Data.Date == data).OrderByDescending(c => c.Data).ToList();
+            ViewBag.Data = data;
+
+            return View("Index", contas);
+
+        }
+
+        public IActionResult RangeSearch(DateTime dataInicial, DateTime dataFinal)
+        {
+            var contas = _context.Conta.Where(c => c.Data.Date >= dataInicial && c.Data.Date <= dataFinal).OrderByDescending(c => c.Data).ToList();
+            ViewBag.DataInicial = dataInicial;
+            ViewBag.DataFinal = dataFinal;  
+
+            return View("Index", contas);
+
+        }
+
         public IActionResult Details(int? id)
         {
            var conta = _context.Conta.Include(c => c.Produtos).ThenInclude(c => c.Produto).FirstOrDefault(c => c.Id == id);

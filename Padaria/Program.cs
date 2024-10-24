@@ -5,6 +5,7 @@ using Padaria.Models;
 using Microsoft.AspNetCore.Localization;
 using System.Globalization;
 using Microsoft.Extensions.Options;
+using Padaria.Services;
 
 
 
@@ -32,6 +33,7 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
 
 
 builder.Services.AddControllersWithViews();
+builder.Services.AddScoped<ProdutoContaService>();
 
 var app = builder.Build();
 

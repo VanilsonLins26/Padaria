@@ -14,7 +14,7 @@ public class PadariaContext : DbContext
 
     public DbSet<Produto> Produto { get; set; } = default!;
     public DbSet<Conta> Conta { get; set; } = default!;
-    public DbSet<ProdutosConta> ProdutosConta { get; set; } = default!;
+    public DbSet<ProdutoConta> ProdutosConta { get; set; } = default!;
 
 
 

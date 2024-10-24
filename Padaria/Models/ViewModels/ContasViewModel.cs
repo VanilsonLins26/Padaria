@@ -3,6 +3,6 @@
     public class ContasViewModel
     {
         public Conta Conta {  get; set; }
-        public ICollection<ProdutosConta> Produtos { get; set; }
+        public ICollection<ProdutoConta> Produtos { get; set; }
     }
 }
