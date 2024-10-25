@@ -1,61 +1,62 @@
 ﻿@model Padaria.Models.Produto
 
 @{
-    ViewData["Title"] = "Create";
-
+    ViewData["Title"] = "Criar Produto";
 }
 
-<h1>Create</h1>
+<h1 class ="mt-4 mb-4">Criar Produto</h1>
 
-<h4>Produto</h4>
+
 <hr />
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-6">
         <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Codigo" class="control-label"></label>
-                <input asp-for="Codigo" class="form-control" autofocus />
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Codigo" class="form-label"></label>
+                <input asp-for="Codigo" class="form-control" placeholder="Digite o código do produto" autofocus />
                 <span asp-validation-for="Codigo" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Nome" class="control-label"></label>
-                <input asp-for="Nome" class="form-control" />
+
+            <div class="form-group mb-3">
+                <label asp-for="Nome" class="form-label"></label>
+                <input asp-for="Nome" class="form-control" placeholder="Digite o nome do produto" />
                 <span asp-validation-for="Nome" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Preco" class="control-label"></label>
-                <input asp-for="Preco" class="form-control" />
+
+            <div class="form-group mb-3">
+                <label asp-for="Preco" class="form-label"></label>
+                <input asp-for="Preco" class="form-control" placeholder="Digite o preço do produto" />
                 <span asp-validation-for="Preco" class="text-danger"></span>
             </div>
 
-            <div class="form-group">
-                <label asp-for="Tipo" class="control-label"></label>
-                <select asp-for="Tipo" asp-items="Html.GetEnumSelectList<Padaria.Models.Enums.Tipo>()" class="form-control"></select>
+            <div class="form-group mb-3">
+                <label asp-for="Tipo" class="form-label"></label>
+                <select asp-for="Tipo" asp-items="Html.GetEnumSelectList<Padaria.Models.Enums.Tipo>()" class="form-select">
+                    <option value="">Selecione o tipo</option>
+                </select>
                 <span asp-validation-for="Tipo" class="text-danger"></span>
-
             </div>
 
+            <div class="form-group mb-3">
+                <label asp-for="QntDisponiveis" class="form-label"></label>
+                <input asp-for="QntDisponiveis" class="form-control" placeholder="Quantidade disponível" />
+                <span asp-validation-for="QntDisponiveis" class="text-danger"></span>
+            </div>
 
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" style="display:none" />
+                <button type="submit" class="btn btn-primary">Criar</button>
             </div>
         </form>
-
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
+<div class="mt-3">
+    <a asp-action="Index" class="btn btn-secondary">Voltar à Lista</a>
 </div>
 
 @section Scripts {
-
-
-
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script src="@Url.Content("~/js/jquery.validate.pt-BR.js")"></script>
-
 }

@@ -11,46 +11,52 @@ namespace Padaria.Controllers
 
         public ContasController(PadariaContext context)
         {
-            
+
             _context = context;
         }
 
         public IActionResult Index()
         {
-           var contas = _context.Conta.OrderByDescending(c => c.Data).ToList();
+            var contas = _context.Conta.OrderByDescending(c => c.Data).ToList();
             return View(contas);
         }
 
 
 
-       
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create(List<ProdutoConta> p, Conta conta)
         {
-            
-                
-                    
-                    foreach (var item in p)
+
+
+
+            foreach (var item in p)
+            {
+                var produto = _context.Produto.FirstOrDefault(pr => pr.Id == item.Produto.Id);
+
+                if (produto != null)
+                {
+                    var pc = new ProdutoConta { Produto = produto, Quantidade = item.Quantidade, Conta = conta, Total = item.Total };
+                    produto.QntDisponiveis -= item.Quantidade;
+                    produto.QntVendidas += item.Quantidade;
+                    if(produto.QntDisponiveis < 0)
                     {
-                        var produto = _context.Produto.FirstOrDefault(pr => pr.Id == item.Produto.Id);
-
-                        if (produto != null)
-                        {
-                            var pc = new ProdutoConta { Produto = produto, Quantidade = item.Quantidade, Conta = conta, Total = item.Total};
-                            conta.Produtos.Add(pc);
-                            _context.Add(conta);
-                        }
-                        
-                        
-
+                        produto.QntDisponiveis = 0; 
                     }
-                    _context.SaveChanges();
+                    conta.Produtos.Add(pc);
+                    _context.Add(conta);
+                }
 
-                    return RedirectToAction("Index", "Home");
-                
- 
+
+
+            }
+            _context.SaveChanges();
+
+            return RedirectToAction("Index", "Home");
+
+
         }
 
         public IActionResult UnicSearch(DateTime data)
@@ -66,7 +72,7 @@ namespace Padaria.Controllers
         {
             var contas = _context.Conta.Where(c => c.Data.Date >= dataInicial && c.Data.Date <= dataFinal).OrderByDescending(c => c.Data).ToList();
             ViewBag.DataInicial = dataInicial;
-            ViewBag.DataFinal = dataFinal;  
+            ViewBag.DataFinal = dataFinal;
 
             return View("Index", contas);
 
@@ -74,11 +80,11 @@ namespace Padaria.Controllers
 
         public IActionResult Details(int? id)
         {
-           var conta = _context.Conta.Include(c => c.Produtos).ThenInclude(c => c.Produto).FirstOrDefault(c => c.Id == id);
+            var conta = _context.Conta.Include(c => c.Produtos).ThenInclude(c => c.Produto).FirstOrDefault(c => c.Id == id);
 
             return View(conta);
         }
     }
 
-   
+
 }

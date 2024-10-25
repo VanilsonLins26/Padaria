@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Padaria.Migrations
 {
     [DbContext(typeof(PadariaContext))]
-    partial class PadariaContextModelSnapshot : ModelSnapshot
+    [Migration("20241024172136_KeyCodigo")]
+    partial class KeyCodigo
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -75,15 +78,11 @@ namespace Padaria.Migrations
 
             modelBuilder.Entity("Padaria.Models.Produto", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
-
                     b.Property<string>("Codigo")
-                        .IsRequired()
                         .HasColumnType("varchar(255)");
+
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
 
                     b.Property<string>("Nome")
                         .IsRequired()
@@ -101,10 +100,7 @@ namespace Padaria.Migrations
                     b.Property<int>("Tipo")
                         .HasColumnType("int");
 
-                    b.HasKey("Id");
-
-                    b.HasIndex("Codigo")
-                        .IsUnique();
+                    b.HasKey("Codigo");
 
                     b.ToTable("Produto");
                 });
@@ -120,6 +116,10 @@ namespace Padaria.Migrations
                     b.Property<int?>("ContaId")
                         .HasColumnType("int");
 
+                    b.Property<string>("ProdutoCodigo")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
                     b.Property<int>("ProdutoId")
                         .HasColumnType("int");
 
@@ -133,7 +133,7 @@ namespace Padaria.Migrations
 
                     b.HasIndex("ContaId");
 
-                    b.HasIndex("ProdutoId");
+                    b.HasIndex("ProdutoCodigo");
 
                     b.ToTable("ProdutosConta");
                 });
@@ -171,7 +171,7 @@ namespace Padaria.Migrations
 
                     b.HasOne("Padaria.Models.Produto", "Produto")
                         .WithMany("Produtos")
-                        .HasForeignKey("ProdutoId")
+                        .HasForeignKey("ProdutoCodigo")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 

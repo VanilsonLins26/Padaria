@@ -92,7 +92,7 @@ namespace Padaria.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Codigo,Nome,Preco,Tipo")] Produto produto)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Codigo,Nome,Preco,Tipo")] Produto produto, int quantidade)
         {
             if (id != produto.Id)
             {
@@ -103,6 +103,7 @@ namespace Padaria.Controllers
             {
                 try
                 {
+                    produto.QntDisponiveis += quantidade;
                     _context.Update(produto);
                     await _context.SaveChangesAsync();
                 }
@@ -158,6 +159,19 @@ namespace Padaria.Controllers
         private bool ProdutoExists(int id)
         {
             return _context.Produto.Any(e => e.Id == id);
+        }
+
+        public IActionResult Search(string nome)
+        {
+            List<Produto> produtos = new List<Produto>();
+            if (string.IsNullOrEmpty(nome))
+                produtos = _context.Produto.ToList();
+               
+            else
+             produtos = _context.Produto.Where(p => p.Nome.Contains(nome)).ToList();
+
+            return View(nameof(Index) , produtos);
+
         }
     }
 }

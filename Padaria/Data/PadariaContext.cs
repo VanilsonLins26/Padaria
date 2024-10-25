@@ -20,6 +20,7 @@ public class PadariaContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Produto>().HasIndex(e => e.Codigo).IsUnique();
         base.OnModelCreating(modelBuilder);
         foreach (var foreignKey in modelBuilder.Model.GetEntityTypes()
         .SelectMany(e => e.GetForeignKeys()))
