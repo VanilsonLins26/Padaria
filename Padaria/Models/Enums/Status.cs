@@ -6,9 +6,8 @@ namespace Padaria.Models.Enums
     {
         [Display(Name ="Pedido Feito")]
         Andamento = 0,
-        Pago = 1,
-        Entregue = 2,
-        Cancelado = 3,
+        Concluido = 1,
+        
 
 
     }

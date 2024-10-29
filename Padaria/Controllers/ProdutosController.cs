@@ -92,7 +92,7 @@ namespace Padaria.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Codigo,Nome,Preco,Tipo")] Produto produto, int quantidade)
+        public async Task<IActionResult> Edit(int id, Produto produto, int quantidade)
         {
             if (id != produto.Id)
             {

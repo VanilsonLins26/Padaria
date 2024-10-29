@@ -8,18 +8,21 @@ namespace Padaria.Models
     public class Encomenda : Conta
     {
         [ForeignKey("Conta")]
-        public  int ContaId { get; set; }
-        public DateTime DataEntrega { get; set; }
-        public Cliente Cliente { get; set; }
+        
+        public DateTime DataPedido { get; set; }
+        public Cliente? Cliente { get; set; }
         public Status Status { get; set; }
-        public Conta Conta { get; set; }
+        
 
         public Encomenda() { }
 
-        public Encomenda(DateTime data, DateTime dataEntrega, Cliente cliente) : base(data)
+        public Encomenda(int id, DateTime data, DateTime dataPedido, Cliente cliente, Status status, double valorTotal,MetodoPagamento metodoPagamento ) : base(id, data, metodoPagamento, valorTotal )
         {
-            DataEntrega = dataEntrega;
+             
+            DataPedido = dataPedido;
             Cliente = cliente;
+            Status = status;
+
            
         }
 

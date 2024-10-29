@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Padaria.Migrations
 {
     [DbContext(typeof(PadariaContext))]
-    partial class PadariaContextModelSnapshot : ModelSnapshot
+    [Migration("20241028165350_v1.0")]
+    partial class v10
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -152,7 +155,10 @@ namespace Padaria.Migrations
                 {
                     b.HasBaseType("Padaria.Models.Conta");
 
-                    b.Property<int?>("ClienteId")
+                    b.Property<int>("ClienteId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ContaId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("DataPedido")
@@ -162,6 +168,9 @@ namespace Padaria.Migrations
                         .HasColumnType("int");
 
                     b.HasIndex("ClienteId");
+
+                    b.HasIndex("ContaId")
+                        .IsUnique();
 
                     b.HasDiscriminator().HasValue("Encomenda");
                 });
@@ -197,14 +206,28 @@ namespace Padaria.Migrations
                     b.HasOne("Padaria.Models.Cliente", "Cliente")
                         .WithMany("Encomendas")
                         .HasForeignKey("ClienteId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Padaria.Models.Conta", "Conta")
+                        .WithOne("Encomenda")
+                        .HasForeignKey("Padaria.Models.Encomenda", "ContaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("Cliente");
+
+                    b.Navigation("Conta");
                 });
 
             modelBuilder.Entity("Padaria.Models.Cliente", b =>
                 {
                     b.Navigation("Encomendas");
+                });
+
+            modelBuilder.Entity("Padaria.Models.Conta", b =>
+                {
+                    b.Navigation("Encomenda");
                 });
 
             modelBuilder.Entity("Padaria.Models.Produto", b =>

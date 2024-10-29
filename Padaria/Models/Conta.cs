@@ -9,7 +9,7 @@ namespace Padaria.Models
         public int Id { get; set; }
         public DateTime Data { get; set; }
         public ICollection<ProdutoConta> Produtos  { get; set; } = new List<ProdutoConta>();  
-        public Encomenda? Encomenda { get; set; }
+        
 
         [Display(Name ="Valor Total")]
         [DataType(DataType.Currency)]
@@ -18,15 +18,13 @@ namespace Padaria.Models
 
         public Conta() { }
 
-        public Conta(DateTime data)
-        {
-            Data = data;
-        }
-        public Conta(int id, DateTime data, MetodoPagamento metodoPagamento)
+       
+        public Conta(int id, DateTime data, MetodoPagamento metodoPagamento, double valorTotal)
         {
             Data = data;
             Id = id;
             MetodoPagamento = metodoPagamento;
+            ValorTotal = valorTotal;    
 
         }
 

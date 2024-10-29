@@ -6,11 +6,10 @@ namespace Padaria.Models
     public class ProdutoConta
     {
         public int Id { get; set; }
-        public int? ContaId { get; set; }
         public int ProdutoId { get; set; }
         public Produto Produto { get; set; }
         public int Quantidade { get; set; }
-        public virtual Conta? Conta { get; set; }
+        public ICollection<Conta> Contas { get; set; } = new List<Conta>();
         [DataType(DataType.Currency)]
         [Display(Name="Valor")]
         public double Total { get; set; }
@@ -18,11 +17,10 @@ namespace Padaria.Models
 
         public ProdutoConta() { }
 
-        public ProdutoConta(int id, Produto produto, int quantidade, Conta? conta, double total)
+        public ProdutoConta(int id, Produto produto, int quantidade, double total)
         {
             Produto = produto;
             Quantidade = quantidade;
-            Conta = conta;
             Id = id;
             Total = total;
         }
