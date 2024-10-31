@@ -7,8 +7,9 @@ namespace Padaria.Models
     public class Conta
     {
         public int Id { get; set; }
+        
         public DateTime Data { get; set; }
-        public ICollection<ProdutoConta> Produtos  { get; set; } = new List<ProdutoConta>();  
+        public List<ProdutoConta> Produtos  { get; set; } = new List<ProdutoConta>();  
         
 
         [Display(Name ="Valor Total")]

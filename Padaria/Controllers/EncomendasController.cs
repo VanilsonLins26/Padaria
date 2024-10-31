@@ -1,8 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
+using Microsoft.CSharp.RuntimeBinder;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Padaria.Migrations;
 using Padaria.Models;
 using Padaria.Models.ViewModels;
 using Padaria.Services;
+using System.Linq;
+using System.Reflection;
 
 namespace Padaria.Controllers
 {
@@ -10,7 +16,7 @@ namespace Padaria.Controllers
     {
 
         public readonly PadariaContext _context;
-        public readonly ProdutoContaService _produtoContaService;   
+        public readonly ProdutoContaService _produtoContaService;
 
         public EncomendasController(PadariaContext context, ProdutoContaService produtoContaService)
         {
@@ -20,19 +26,44 @@ namespace Padaria.Controllers
 
         public IActionResult Index()
         {
-            var encomendas = _context.Encomenda.ToList();
-            return View(encomendas);
+            var encomendas = _context.Encomenda.Include(e => e.Cliente).OrderBy(e => e.Data).ToList();
+            var agrupamento = _context.Encomenda.Include(e => e.Cliente).OrderBy(e => e.Data).GroupBy(e => e.Data.Date).ToList();
+            return View(agrupamento);
         }
 
         public IActionResult Create()
         {
-            return View();
+            var clientes = _context.Cliente.OrderBy(c => c.Nome).ToList();
+            var e = new EncomendaViewModel { Clientes = clientes };
+           
+            return View(e);
+
+            
+
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create(Encomenda encomenda)
         {
+            var item = encomenda.Produtos;
+            for(int i = 0; i < item.Count; i++)
+            {
+                var produto = _context.Produto.FirstOrDefault(p =>  p.Id == item[i].ProdutoId);   
+                var pc = _context.ProdutosConta.FirstOrDefault(pc => pc.Quantidade == item[i].Quantidade && pc.Produto == produto);
+                  
+                if (pc != null)
+                {
+                    item[i] = pc;
+                }
+               
+                
+
+            }
+            
+
+            var cliente = _context.Cliente.Where(c => c.Id == encomenda.Cliente.Id).FirstOrDefault();   
+            encomenda.Cliente = cliente;
             _context.Add(encomenda);
             _context.SaveChanges();
             return RedirectToAction(nameof(Index));
@@ -41,31 +72,59 @@ namespace Padaria.Controllers
 
         public IActionResult AddProduto(string codigo, EncomendaViewModel? encomenda)
         {
+
             
+
             var produto = _context.Produto.FirstOrDefault(p => p.Codigo.Equals(codigo));
-            
-            
-                foreach (var item in encomenda.ProdutosConta)
-                {
-
-                    var p = _context.Produto.FirstOrDefault(p => p.Id == item.ProdutoId);
-                    item.Produto = p;
-                }
-            
-                if (produto != null)
-                {
-
-                    var pc = new ProdutoConta { Produto = produto, Quantidade = 1, ProdutoId = produto.Id };
-                    pc.Total = _produtoContaService.ValorTotalProduto(pc);
-                    encomenda.ProdutosConta.Add(pc);
 
 
-                }
-                ViewBag.Total = encomenda.ProdutosConta.Sum(p => p.Total);
             
+
+            if (produto != null)
+            {
+
+                var pc = new ProdutoConta { Produto = produto, Quantidade = 1, ProdutoId = produto.Id };
+                
+                encomenda.ProdutosConta.Add(pc);
+
+
+            }
+            foreach (var item in encomenda.ProdutosConta)
+            {
+
+                var p = _context.Produto.FirstOrDefault(p => p.Id == item.ProdutoId);
+                item.Produto = p;
+                item.Total = _produtoContaService.ValorTotalProduto(item);
+                
+            }
+            var c = _context.Cliente.FirstOrDefault(c => c.Id == encomenda.Cliente.Id);
+            ViewBag.Total = encomenda.ProdutosConta.Sum(p => p.Total);
+            encomenda.Clientes.Add(c); 
             
+           
+
+
             return View(nameof(Create), encomenda);
-            
+
+        }
+
+        public IActionResult SearchCLiente(string cliente)
+        {
+            var clientes = _context.Cliente.Where(c => c.Nome.Contains(cliente)).OrderBy(c => c.Nome).ToList();
+            if (cliente.IsNullOrEmpty())
+            {
+                return BadRequest();
+            }
+            var e = new EncomendaViewModel { Clientes = clientes };
+
+            return View(nameof(Create), e);
+        }
+
+        public IActionResult Details(int id)
+        {
+            var encomenda = _context.Encomenda.Include(e => e.Cliente).Include(e => e.Produtos).ThenInclude(p => p.Produto).FirstOrDefault(e => e.Id == id);
+            return View(encomenda);
+
         }
 
 

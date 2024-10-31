@@ -6,6 +6,7 @@ namespace Padaria.Models
     {
         public int Id { get; set; } 
         public string Nome { get; set; }
+        [Phone]
         public string Contato { get; set; }
         public ICollection<Encomenda> ?Encomendas { get; set; }
 
