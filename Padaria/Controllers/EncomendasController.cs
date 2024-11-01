@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Padaria.Migrations;
 using Padaria.Models;
+using Padaria.Models.Enums;
 using Padaria.Models.ViewModels;
 using Padaria.Services;
 using System.Linq;
@@ -26,8 +27,8 @@ namespace Padaria.Controllers
 
         public IActionResult Index()
         {
-            var encomendas = _context.Encomenda.Include(e => e.Cliente).OrderBy(e => e.Data).ToList();
-            var agrupamento = _context.Encomenda.Include(e => e.Cliente).OrderBy(e => e.Data).GroupBy(e => e.Data.Date).ToList();
+            
+            var agrupamento = _context.Encomenda.Where(e=> e.Status == Status.Andamento).Include(e => e.Cliente).OrderBy(e => e.Data).GroupBy(e => e.Data.Date).ToList();
             return View(agrupamento);
         }
 
@@ -124,6 +125,47 @@ namespace Padaria.Controllers
         {
             var encomenda = _context.Encomenda.Include(e => e.Cliente).Include(e => e.Produtos).ThenInclude(p => p.Produto).FirstOrDefault(e => e.Id == id);
             return View(encomenda);
+
+        }
+
+        public IActionResult ConfirmarEntrega(int id, MetodoPagamento metodoPagamento)
+        {
+            var enc = _context.Encomenda.FirstOrDefault(e => e.Id == id);    
+            enc.Status = Status.Concluido;
+            enc.MetodoPagamento = metodoPagamento;
+            enc.Data = DateTime.Now;    
+            _context.Update(enc);
+            _context.SaveChanges(); 
+            return RedirectToAction(nameof(Index));
+
+        }
+
+        public IActionResult Completed()
+        {
+            var concluidos = _context.Encomenda.Where(e=> e.Status == Status.Concluido).Include(e => e.Cliente).ToList();    
+            return View(concluidos);
+
+
+        }
+
+        public IActionResult Search(DateTime dataInicial, DateTime? dataFinal)
+        {
+            List<Encomenda> concluidos = new List<Encomenda>();
+            if (dataFinal != null)
+            {
+                concluidos = _context.Encomenda.Where(e => e.Data.Date >= dataInicial && e.Data.Date <= dataFinal && e.Status == Status.Concluido).OrderByDescending(e => e.Data).ToList();
+
+            }
+            else
+            {
+                concluidos = _context.Encomenda.Where(e => e.Data.Date == dataInicial && e.Status == Status.Concluido).OrderByDescending(e => e.Data).ToList();
+
+
+            }
+            ViewBag.DataInicial = dataInicial;
+            ViewBag.DataFinal = dataFinal;
+
+            return View("Completed", concluidos);
 
         }
 
