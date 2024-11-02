@@ -21,10 +21,18 @@
         <div class="col-sm-6">
             <h5>Informações da Encomenda</h5>
             <dl class="row">
-                <dt class="col-sm-5 fw-bold">@Html.DisplayNameFor(model => model.Data)</dt>
+                <dt class="col-sm-5 fw-bold">Pedido feito: </dt>
+                <dd class="col-sm-7">@Html.DisplayFor(model => model.DataPedido)</dd>
+                <dt class="col-sm-5 fw-bold">Entrega: </dt>
                 <dd class="col-sm-7">@Html.DisplayFor(model => model.Data)</dd>
+                <dt class="col-sm-5 fw-bold">@Html.DisplayNameFor(model => model.Cliente.Nome)</dt>
+                <dd class="col-sm-7">@Html.DisplayFor(model => model.Cliente.Nome) - @Html.DisplayFor(model => model.Cliente.Contato)</dd>
+                <dt class="col-sm-5 fw-bold">@Html.DisplayNameFor(model => model.Status)</dt>
+                <dd class="col-sm-7">@Html.DisplayFor(model => model.Status)</dd>
                 <dt class="col-sm-5 fw-bold">@Html.DisplayNameFor(model => model.MetodoPagamento)</dt>
                 <dd class="col-sm-7">@Html.DisplayFor(model => model.MetodoPagamento)</dd>
+                <dt class="col-sm-5 fw-bold">@Html.DisplayNameFor(model => model.Obs)</dt>
+                <dd class="col-sm-7">@Html.DisplayFor(model => model.Obs)</dd>
             </dl>
         </div>
     </div>

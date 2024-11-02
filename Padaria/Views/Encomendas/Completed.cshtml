@@ -8,6 +8,11 @@
 <div class="container mt-5">
     <h1 class="text-center mb-4">@ViewData["Title"]</h1>
 
+    <div class="d-flex justify-content-end mb-4">
+        
+        <a asp-action="Index" class="btn btn-secondary">Em andamento</a>
+    </div>
+
     <form class="form-inline mb-4" asp-action="Search">
         <div class="input-group">
             <span class="input-group-text">Data Inicial:</span>

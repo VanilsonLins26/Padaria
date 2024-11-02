@@ -7,15 +7,25 @@
 <div class="container mt-5">
     <h1 class="text-center mb-4">@ViewData["Title"]</h1>
 
-    <div class="card mb-4 shadow-sm">
-        <div class="card-body">
-            <h4 class="card-title">Conta n° @Model.Id</h4>
-            <hr />
-            <dl class="row mb-4">
-                <dt class="col-sm-3 fw-bold">@Html.DisplayNameFor(model => model.Data)</dt>
-                <dd class="col-sm-9">@Html.DisplayFor(model => model.Data)</dd>
-                <dt class="col-sm-3 fw-bold">@Html.DisplayNameFor(model => model.MetodoPagamento)</dt>
-                <dd class="col-sm-9">@Html.DisplayFor(model => model.MetodoPagamento)</dd>
+    <div class="row mb-4">
+        <div class="col-sm-12">
+            <div class="alert alert-primary" role="alert">
+                <h4 class="mb-0">Conta n° @Model.Id</h4>
+            </div>
+        </div>
+    </div>
+
+    <hr />
+
+    <div class="row mb-4">
+        <div class="col-sm-6">
+            <h5>Informações da Encomenda</h5>
+            <dl class="row">
+                <dt class="col-sm-5 fw-bold">@Html.DisplayNameFor(model => model.Data)</dt>
+                <dd class="col-sm-7">@Html.DisplayFor(model => model.Data)</dd>
+                <dt class="col-sm-5 fw-bold">@Html.DisplayNameFor(model => model.MetodoPagamento)</dt>
+                <dd class="col-sm-7">@Html.DisplayFor(model => model.MetodoPagamento)</dd>
+
             </dl>
         </div>
     </div>

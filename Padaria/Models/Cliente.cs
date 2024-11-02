@@ -4,6 +4,7 @@ namespace Padaria.Models
 {
     public class Cliente
     {
+        [Required(ErrorMessage = "Por favor, selecione um cliente.")]
         public int Id { get; set; } 
         public string Nome { get; set; }
         [Phone]

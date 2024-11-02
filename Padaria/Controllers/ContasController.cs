@@ -20,12 +20,10 @@ namespace Padaria.Controllers
         public IActionResult Index()
         {
             var encomendas = _context.Conta.Where(e => (e as Encomenda).Status == Status.Andamento);
-            
+
             var contas = _context.Conta.Except(encomendas).OrderByDescending(c => c.Data).ToList();
             return View(contas);
         }
-
-
 
 
 
