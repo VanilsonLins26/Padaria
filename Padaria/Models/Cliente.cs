@@ -5,9 +5,13 @@ namespace Padaria.Models
     public class Cliente
     {
         [Required(ErrorMessage = "Por favor, selecione um cliente.")]
-        public int Id { get; set; } 
+        public int Id { get; set; }
+
+        [Required(ErrorMessage = "Por favor, insira um nome")]
         public string Nome { get; set; }
         [Phone]
+        [Required(ErrorMessage = "Por favor, insira um contato")]
+        [StringLength(20, MinimumLength = 15, ErrorMessage = "Insira um numero valido")]
         public string Contato { get; set; }
         public ICollection<Encomenda> ?Encomendas { get; set; }
 

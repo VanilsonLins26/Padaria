@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.CSharp.RuntimeBinder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Padaria.Migrations;
+
 using Padaria.Models;
 using Padaria.Models.Enums;
 using Padaria.Models.ViewModels;
@@ -36,6 +36,7 @@ namespace Padaria.Controllers
         {
             var clientes = _context.Cliente.OrderBy(c => c.Nome).ToList();
             var e = new EncomendaViewModel { Clientes = clientes };
+
            
             return View(e);
 
@@ -55,6 +56,12 @@ namespace Padaria.Controllers
                     var produto = _context.Produto.FirstOrDefault(p => p.Id == item[i].ProdutoId);
                     var pc = _context.ProdutosConta.FirstOrDefault(pc => pc.Quantidade == item[i].Quantidade && pc.Produto == produto);
 
+                    produto.QntDisponiveis -= item[i].Quantidade;
+                    produto.QntVendidas += item[i].Quantidade;
+                    if (produto.QntDisponiveis < 0)
+                    {
+                        produto.QntDisponiveis = 0;
+                    }
                     if (pc != null)
                     {
                         item[i] = pc;
@@ -75,18 +82,24 @@ namespace Padaria.Controllers
 
         }
 
-        public IActionResult AddProduto(string codigo, EncomendaViewModel? encomenda)
+        public IActionResult AddProduto(string? codigo, EncomendaViewModel? encomenda)
         {
 
-           
+            if (codigo != null)
+            {
 
 
                 var produto = _context.Produto.FirstOrDefault(p => p.Codigo.Equals(codigo));
 
+                if (produto == null)
+                {
+                    TempData["ErrorMessage"] = "Produto não encontrado";
+
+                }
 
 
 
-                if (produto != null)
+                else
                 {
 
                     var pc = new ProdutoConta { Produto = produto, Quantidade = 1, ProdutoId = produto.Id };
@@ -95,6 +108,7 @@ namespace Padaria.Controllers
 
 
                 }
+            }
             
             foreach (var item in encomenda.ProdutosConta)
             {
@@ -103,9 +117,20 @@ namespace Padaria.Controllers
                 item.Produto = p;
                 item.Total = _produtoContaService.ValorTotalProduto(item);
                 
+                
+
             }
-            
-            var cliente = _context.Cliente.FirstOrDefault(c => c.Id == encomenda.Cliente.Id);
+            foreach (var item in encomenda.ProdutosConta)
+            {
+                if (item.Quantidade == 0)
+                {
+                    encomenda.ProdutosConta.Remove(item);
+                    break;
+                }
+            }
+
+
+                var cliente = _context.Cliente.FirstOrDefault(c => c.Id == encomenda.Cliente.Id);
             if (cliente == null)
             {
                 return NotFound();

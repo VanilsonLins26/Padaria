@@ -2,17 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
 namespace Padaria.Migrations
 {
     [DbContext(typeof(PadariaContext))]
-    [Migration("20241025033234_fix")]
-    partial class fix
+    [Migration("20241104180503_Test")]
+    partial class Test
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -20,17 +20,17 @@ namespace Padaria.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "8.0.10")
-                .HasAnnotation("Relational:MaxIdentifierLength", 64);
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("ContaProdutoConta", b =>
                 {
                     b.Property<int>("ContasId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("ProdutosId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("ContasId", "ProdutosId");
 
@@ -43,17 +43,18 @@ namespace Padaria.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Contato")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
 
                     b.Property<string>("Nome")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -64,23 +65,23 @@ namespace Padaria.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("Data")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Discriminator")
                         .IsRequired()
                         .HasMaxLength(13)
-                        .HasColumnType("varchar(13)");
+                        .HasColumnType("character varying(13)");
 
                     b.Property<int>("MetodoPagamento")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<double>("ValorTotal")
-                        .HasColumnType("double");
+                        .HasColumnType("double precision");
 
                     b.HasKey("Id");
 
@@ -95,29 +96,29 @@ namespace Padaria.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Codigo")
                         .IsRequired()
-                        .HasColumnType("varchar(255)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Nome")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<double>("Preco")
-                        .HasColumnType("double");
+                        .HasColumnType("double precision");
 
                     b.Property<int>("QntDisponiveis")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("QntVendidas")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Tipo")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -131,18 +132,18 @@ namespace Padaria.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("ProdutoId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Quantidade")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<double>("Total")
-                        .HasColumnType("double");
+                        .HasColumnType("double precision");
 
                     b.HasKey("Id");
 
@@ -155,22 +156,25 @@ namespace Padaria.Migrations
                 {
                     b.HasBaseType("Padaria.Models.Conta");
 
-                    b.Property<int>("ClienteId")
-                        .HasColumnType("int");
+                    b.Property<int>("ClientId")
+                        .HasColumnType("integer");
 
-                    b.Property<int>("ContaId")
-                        .HasColumnType("int");
+                    b.Property<int?>("ClienteId")
+                        .HasColumnType("integer");
 
-                    b.Property<DateTime>("DataEntrega")
-                        .HasColumnType("datetime(6)");
+                    b.Property<DateTime>("DataPedido")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Obs")
+                        .HasColumnType("text");
 
                     b.Property<int>("Status")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
+
+                    b.Property<double>("ValorAntecipado")
+                        .HasColumnType("double precision");
 
                     b.HasIndex("ClienteId");
-
-                    b.HasIndex("ContaId")
-                        .IsUnique();
 
                     b.HasDiscriminator().HasValue("Encomenda");
                 });
@@ -206,28 +210,14 @@ namespace Padaria.Migrations
                     b.HasOne("Padaria.Models.Cliente", "Cliente")
                         .WithMany("Encomendas")
                         .HasForeignKey("ClienteId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Padaria.Models.Conta", "Conta")
-                        .WithOne("Encomenda")
-                        .HasForeignKey("Padaria.Models.Encomenda", "ContaId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Cliente");
-
-                    b.Navigation("Conta");
                 });
 
             modelBuilder.Entity("Padaria.Models.Cliente", b =>
                 {
                     b.Navigation("Encomendas");
-                });
-
-            modelBuilder.Entity("Padaria.Models.Conta", b =>
-                {
-                    b.Navigation("Encomenda");
                 });
 
             modelBuilder.Entity("Padaria.Models.Produto", b =>

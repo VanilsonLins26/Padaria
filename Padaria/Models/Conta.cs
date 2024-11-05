@@ -7,7 +7,8 @@ namespace Padaria.Models
     public class Conta
     {
         public int Id { get; set; }
-        
+
+        [Required(ErrorMessage ="Insira uma data")]
         public DateTime Data { get; set; }
         public List<ProdutoConta> Produtos  { get; set; } = new List<ProdutoConta>();  
         

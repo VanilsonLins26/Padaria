@@ -12,6 +12,10 @@
         <div class="mb-4">
             <label for="codigo" class="form-label">Código do Produto</label>
             <input type="search" name="codigo" class="form-control" autofocus placeholder="Escaneie ou digite o código" style="width: 300px;" />
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <span class="text-danger">@TempData["ErrorMessage"]</span>
+            }
         </div>
 
         @if (Model != null && Model.Produtos.Any())

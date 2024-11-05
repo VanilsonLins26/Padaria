@@ -29,7 +29,7 @@
 
             <div class="form-group mb-3">
                 <label asp-for="Preco" class="form-label"></label>
-                <input asp-for="Preco" class="form-control" />
+                <input id="preco" asp-for="Preco" class="form-control" />
                 <span asp-validation-for="Preco" class="text-danger"></span>
             </div>
 
@@ -56,6 +56,13 @@
 
 
 @section Scripts {
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#preco').mask('000.000.000.000.000,00', { reverse: true });
+        });
+    </script>
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }

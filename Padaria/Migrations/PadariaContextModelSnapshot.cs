@@ -46,7 +46,8 @@ namespace Padaria.Migrations
 
                     b.Property<string>("Contato")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
 
                     b.Property<string>("Nome")
                         .IsRequired()
@@ -155,14 +156,13 @@ namespace Padaria.Migrations
                     b.Property<int>("ClientId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ClienteId")
+                    b.Property<int?>("ClienteId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("DataPedido")
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("Obs")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<int>("Status")
@@ -207,8 +207,7 @@ namespace Padaria.Migrations
                     b.HasOne("Padaria.Models.Cliente", "Cliente")
                         .WithMany("Encomendas")
                         .HasForeignKey("ClienteId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Cliente");
                 });

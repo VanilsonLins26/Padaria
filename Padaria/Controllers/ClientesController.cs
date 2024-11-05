@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Padaria.Models;
+using Padaria.Models.ViewModels;
 
 namespace Padaria.Controllers
 {
@@ -20,7 +22,8 @@ namespace Padaria.Controllers
         public IActionResult Index()
         {
             var clientes = _context.Cliente.ToList();   
-            return View(clientes);
+            var c = new ClientFormView { Clientes = clientes };
+            return View(c);
         }
 
         [HttpPost]
@@ -30,6 +33,47 @@ namespace Padaria.Controllers
             _context.Cliente.Add(cliente);
             _context.SaveChanges();
             return RedirectToAction(nameof(Create), "Encomendas");
+
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(int id, Cliente cliente)
+        {
+            if (ModelState.IsValid)
+            {
+
+
+
+                _context.Update(cliente);
+                _context.SaveChanges();
+                
+
+            }
+            return RedirectToAction(nameof(Index));
+
+
+        }
+
+        public IActionResult Details(int id)
+        {
+
+            var cliente = _context.Cliente.Include(c => c.Encomendas).FirstOrDefault(c => c.Id == id);
+            cliente.Encomendas = cliente.Encomendas.OrderByDescending(e => e.Data).ToList();
+            return View(cliente);
+
+        }
+
+        public IActionResult Search(string nome)
+        {
+            if(nome == null)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+            var clientes = _context.Cliente.Where(c => c.Nome.Contains(nome)).ToList();
+            var c = new ClientFormView { Clientes = clientes };
+            return View(nameof(Index) ,c);  
 
         }
     }

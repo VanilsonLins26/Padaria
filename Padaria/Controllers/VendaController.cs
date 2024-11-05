@@ -7,12 +7,12 @@ using Padaria.Services;
 
 namespace Padaria.Controllers
 {
-    public class HomeController : Controller
+    public class VendaController : Controller
     {
         private readonly ProdutoContaService _produtoContaService;
         private readonly PadariaContext _context;
 
-        public HomeController( PadariaContext context, ProdutoContaService produtoContaService)
+        public VendaController( PadariaContext context, ProdutoContaService produtoContaService)
         {
             
             _context = context;
@@ -30,11 +30,7 @@ namespace Padaria.Controllers
         public async Task<IActionResult> Index(List<ProdutoConta>? p, string? codigo)
         {
 
-            if (!ModelState.IsValid)
-            {
-                
-                return View();
-            }
+            
 
             if (codigo != null)
             {
@@ -43,15 +39,17 @@ namespace Padaria.Controllers
                 var produto = await _produtoContaService.FindByCodeAsync(codigo);
                 if (produto == null)
                 {
-                    return NotFound();
+                    TempData["ErrorMessage"] = "Produto não encontrado";
+
                 }
 
 
+                else
+                {
+                    ProdutoConta pc = new ProdutoConta { Produto = produto, Quantidade = 1, Total = produto.Preco };
 
-                ProdutoConta pc = new ProdutoConta { Produto = produto, Quantidade = 1, Total = produto.Preco };
-
-                p.Add(pc);
-
+                    p.Add(pc);
+                }
 
 
 

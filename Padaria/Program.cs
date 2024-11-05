@@ -18,6 +18,8 @@ builder.Services.AddDbContext<PadariaContext>(options =>
     .Configuration
     .GetConnectionString("PadariaContext"))));
 
+
+
 var supportedCultures = new[]
 {
     new CultureInfo("pt-BR"),
@@ -58,6 +60,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Venda}/{action=Index}/{id?}");
 
 app.Run();

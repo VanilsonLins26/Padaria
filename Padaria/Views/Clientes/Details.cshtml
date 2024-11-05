@@ -1,0 +1,77 @@
+﻿@model Cliente
+
+
+@{
+    ViewData["Title"] = "Detalhes";
+    var encomendas = Model.Encomendas;
+
+}
+<div class="container mt-5">
+    <h1 class="text-center mb-4">@ViewData["Title"]</h1>
+
+    <div class="row mb-4">
+        <div class="col-sm-12">
+            <div class="alert alert-primary" role="alert">
+                <h4 class="mb-0">Cliente n° @Model.Id</h4>
+            </div>
+        </div>
+    </div>
+
+    <hr />
+
+    <div class="row mb-4">
+        <div class="col-sm-6">
+            <h5>Informações da Encomenda</h5>
+            <dl class="row">
+                <dt class="col-sm-5 fw-bold">@Html.DisplayNameFor(model => model.Nome)</dt>
+                <dd class="col-sm-7">@Html.DisplayFor(model => model.Nome)</dd>
+                <dt class="col-sm-5 fw-bold">@Html.DisplayNameFor(model => model.Contato)</dt>
+                <dd class="col-sm-7">@Html.DisplayFor(model => model.Contato)</dd>
+
+            </dl>
+        </div>
+    </div>
+
+    <h5 class="mb-3">Produtos</h5>
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>@Html.DisplayNameFor(model => model.Encomendas.FirstOrDefault().Id)</th>
+                            <th>@Html.DisplayNameFor(model => model.Encomendas.FirstOrDefault().Data)</th>
+                            <th>@Html.DisplayNameFor(model => model.Encomendas.FirstOrDefault().Status)</th>
+                            <th>@Html.DisplayNameFor(model => model.Encomendas.FirstOrDefault().ValorTotal)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (!Model.Encomendas.Any())
+                        {
+                            <tr>
+                                <td colspan="3" class="text-center">Nenhuma encomenda encontrado.</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var item in encomendas)
+                            {
+                                <tr>
+                                    <td><a asp-action="Details" asp-controller="Encomendas" asp-route-id="@item.Id">@Html.DisplayFor(modelItem => item.Id)</a></td>
+                                    <td>@Html.DisplayFor(modelItem => item.Data)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.Status)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.ValorTotal)</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                   
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-center mb-4">
+        <a asp-action="Index" class="btn btn-outline-primary">Voltar</a>
+    </div>
+</div>

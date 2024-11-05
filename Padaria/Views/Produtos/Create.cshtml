@@ -27,7 +27,7 @@
 
             <div class="form-group mb-3">
                 <label asp-for="Preco" class="form-label"></label>
-                <input asp-for="Preco" class="form-control" placeholder="Digite o preço do produto" />
+                <input asp-for="Preco" class="form-control" id="preco" />
                 <span asp-validation-for="Preco" class="text-danger"></span>
             </div>
 
@@ -57,6 +57,15 @@
 </div>
 
 @section Scripts {
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#preco').mask('000.000.000.000.000,00', { reverse: true });
+        });
+    </script>
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script src="@Url.Content("~/js/jquery.validate.pt-BR.js")"></script>
+
+    
 }

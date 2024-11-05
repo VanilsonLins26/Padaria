@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Padaria.Migrations
 {
     [DbContext(typeof(PadariaContext))]
-    [Migration("20241023155407_AddMetodoPagamento")]
-    partial class AddMetodoPagamento
+    [Migration("20241104202632_MySQL")]
+    partial class MySQL
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,21 @@ namespace Padaria.Migrations
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
+            modelBuilder.Entity("ContaProdutoConta", b =>
+                {
+                    b.Property<int>("ContasId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProdutosId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ContasId", "ProdutosId");
+
+                    b.HasIndex("ProdutosId");
+
+                    b.ToTable("ContaProdutoConta");
+                });
+
             modelBuilder.Entity("Padaria.Models.Cliente", b =>
                 {
                     b.Property<int>("Id")
@@ -34,7 +49,8 @@ namespace Padaria.Migrations
 
                     b.Property<string>("Contato")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
 
                     b.Property<string>("Nome")
                         .IsRequired()
@@ -86,7 +102,7 @@ namespace Padaria.Migrations
 
                     b.Property<string>("Codigo")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("Nome")
                         .IsRequired()
@@ -95,24 +111,30 @@ namespace Padaria.Migrations
                     b.Property<double>("Preco")
                         .HasColumnType("double");
 
+                    b.Property<int>("QntDisponiveis")
+                        .HasColumnType("int");
+
+                    b.Property<int>("QntVendidas")
+                        .HasColumnType("int");
+
                     b.Property<int>("Tipo")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Codigo")
+                        .IsUnique();
+
                     b.ToTable("Produto");
                 });
 
-            modelBuilder.Entity("Padaria.Models.ProdutosConta", b =>
+            modelBuilder.Entity("Padaria.Models.ProdutoConta", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("ContaId")
-                        .HasColumnType("int");
 
                     b.Property<int>("ProdutoId")
                         .HasColumnType("int");
@@ -125,8 +147,6 @@ namespace Padaria.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ContaId");
-
                     b.HasIndex("ProdutoId");
 
                     b.ToTable("ProdutosConta");
@@ -136,40 +156,51 @@ namespace Padaria.Migrations
                 {
                     b.HasBaseType("Padaria.Models.Conta");
 
-                    b.Property<int>("ClienteId")
+                    b.Property<int>("ClientId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ContaId")
+                    b.Property<int?>("ClienteId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("DataEntrega")
+                    b.Property<DateTime>("DataPedido")
                         .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Obs")
+                        .HasColumnType("longtext");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.HasIndex("ClienteId");
+                    b.Property<double>("ValorAntecipado")
+                        .HasColumnType("double");
 
-                    b.HasIndex("ContaId")
-                        .IsUnique();
+                    b.HasIndex("ClienteId");
 
                     b.HasDiscriminator().HasValue("Encomenda");
                 });
 
-            modelBuilder.Entity("Padaria.Models.ProdutosConta", b =>
+            modelBuilder.Entity("ContaProdutoConta", b =>
                 {
-                    b.HasOne("Padaria.Models.Conta", "Conta")
-                        .WithMany("Produtos")
-                        .HasForeignKey("ContaId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                    b.HasOne("Padaria.Models.Conta", null)
+                        .WithMany()
+                        .HasForeignKey("ContasId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
+                    b.HasOne("Padaria.Models.ProdutoConta", null)
+                        .WithMany()
+                        .HasForeignKey("ProdutosId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Padaria.Models.ProdutoConta", b =>
+                {
                     b.HasOne("Padaria.Models.Produto", "Produto")
                         .WithMany("Produtos")
                         .HasForeignKey("ProdutoId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.Navigation("Conta");
 
                     b.Navigation("Produto");
                 });
@@ -179,30 +210,14 @@ namespace Padaria.Migrations
                     b.HasOne("Padaria.Models.Cliente", "Cliente")
                         .WithMany("Encomendas")
                         .HasForeignKey("ClienteId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Padaria.Models.Conta", "Conta")
-                        .WithOne("Encomenda")
-                        .HasForeignKey("Padaria.Models.Encomenda", "ContaId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Cliente");
-
-                    b.Navigation("Conta");
                 });
 
             modelBuilder.Entity("Padaria.Models.Cliente", b =>
                 {
                     b.Navigation("Encomendas");
-                });
-
-            modelBuilder.Entity("Padaria.Models.Conta", b =>
-                {
-                    b.Navigation("Encomenda");
-
-                    b.Navigation("Produtos");
                 });
 
             modelBuilder.Entity("Padaria.Models.Produto", b =>

@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Encomendas";
+    
 }
 
 <div class="container mt-5">
@@ -60,7 +61,7 @@
                                     </button>
                                 </td>
                             </tr>
-                            <!-- Modal -->
+                            
                             <div class="modal fade" id="confirmacao-@item.Id" tabindex="-1" aria-labelledby="confirmacaoLabel" aria-hidden="true">
                                 <div class="modal-dialog">
                                     <div class="modal-content">
@@ -72,6 +73,11 @@
                                             <div class="modal-body">
                                                 <p><strong>Valor Total:</strong> @Html.DisplayFor(modelItem => item.ValorTotal)</p>
                                                 <input type="hidden" name="id" value="@item.Id" />
+                                                <div class="mb-3">
+                                                   
+                                                    <p><strong>Valor a pagar:</strong> R$ @((item.ValorTotal - item.ValorAntecipado).ToString("F2"))</p>
+                                                    
+                                                </div>
                                                 <div class="mb-3">
                                                     <label for="metodoPagamento-@item.Id" class="form-label">Método de pagamento:</label>
                                                     <select id="metodoPagamento-@item.Id" name="metodoPagamento" class="form-select" asp-items="@Html.GetEnumSelectList<Padaria.Models.Enums.MetodoPagamento>()"></select>
