@@ -2,11 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Padaria.Models;
 using Padaria.Models.Enums;
+using Padaria.Models.ViewModels;
+using Padaria.Services;
+using Padaria.Services.Exceptions;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Diagnostics;
 
 
 
@@ -15,22 +21,25 @@ namespace Padaria.Controllers
     public class ProdutosController : Controller
     {
         private readonly PadariaContext _context;
+        private readonly ProdutoService _produtoService;
 
-        public ProdutosController(PadariaContext context)
+        public ProdutosController(PadariaContext context, ProdutoService produtoService)
         {
             _context = context;
+            _produtoService = produtoService;
         }
 
-        
 
 
-        // GET: Produtos
+
+
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Produto.ToListAsync());
+            var produtos = await _produtoService.FindAllAsync();
+            return View(produtos);
         }
 
-        // GET: Produtos/Details/5
+
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -38,8 +47,7 @@ namespace Padaria.Controllers
                 return NotFound();
             }
 
-            var produto = await _context.Produto
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var produto = await _produtoService.FindByIdAsync(id.Value);
             if (produto == null)
             {
                 return NotFound();
@@ -48,30 +56,27 @@ namespace Padaria.Controllers
             return View(produto);
         }
 
-        // GET: Produtos/Create
+
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Produtos/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Produto produto)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(produto);
-                await _context.SaveChangesAsync();
+                await _produtoService.AddAsync(produto);
                 return RedirectToAction(nameof(Index));
-                
+
             }
             return View(produto);
         }
 
-        // GET: Produtos/Edit/5
+
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -79,7 +84,7 @@ namespace Padaria.Controllers
                 return NotFound();
             }
 
-            var produto = await _context.Produto.FindAsync(id);
+            var produto = await _produtoService.FindByIdAsync(id.Value);
             if (produto == null)
             {
                 return NotFound();
@@ -87,9 +92,7 @@ namespace Padaria.Controllers
             return View(produto);
         }
 
-        // POST: Produtos/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Produto produto, int quantidade)
@@ -104,8 +107,7 @@ namespace Padaria.Controllers
                 try
                 {
                     produto.QntDisponiveis += quantidade;
-                    _context.Update(produto);
-                    await _context.SaveChangesAsync();
+                    await _produtoService.UpdateAsync(produto);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -123,7 +125,7 @@ namespace Padaria.Controllers
             return View(produto);
         }
 
-        // GET: Produtos/Delete/5
+
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -131,8 +133,7 @@ namespace Padaria.Controllers
                 return NotFound();
             }
 
-            var produto = await _context.Produto
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var produto = await _produtoService.FindByIdAsync(id.Value);
             if (produto == null)
             {
                 return NotFound();
@@ -141,19 +142,31 @@ namespace Padaria.Controllers
             return View(produto);
         }
 
-        // POST: Produtos/Delete/5
+
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var produto = await _context.Produto.FindAsync(id);
-            if (produto != null)
+
+
+            try
             {
-                _context.Produto.Remove(produto);
+                await _produtoService.RemoveAsync(id);
+
             }
 
-            await _context.SaveChangesAsync();
+            catch (IntegrityException e)
+            {
+                return RedirectToAction(nameof(Error), new { message = e.Message });
+
+            }
+
+
+
+
             return RedirectToAction(nameof(Index));
+
+
         }
 
         private bool ProdutoExists(int id)
@@ -161,17 +174,30 @@ namespace Padaria.Controllers
             return _context.Produto.Any(e => e.Id == id);
         }
 
-        public IActionResult Search(string nome)
+        public async Task<IActionResult> Search(string nome)
         {
             List<Produto> produtos = new List<Produto>();
             if (string.IsNullOrEmpty(nome))
-                produtos = _context.Produto.ToList();
-               
-            else
-             produtos = _context.Produto.Where(p => p.Nome.Contains(nome)).ToList();
+                produtos = await _produtoService.FindAllAsync();
 
-            return View(nameof(Index) , produtos);
+            else
+                produtos = await _produtoService.SearchAsync(nome);
+
+            return View(nameof(Index), produtos);
 
         }
+
+        public IActionResult Error(string message)
+        {
+            var viewModel = new ErrorViewModel
+            {
+                Message = message,
+                RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier 
+
+            };  
+            return View(viewModel);
+        }
     }
+
+
 }

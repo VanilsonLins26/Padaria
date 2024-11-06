@@ -3,25 +3,30 @@ using Microsoft.EntityFrameworkCore;
 using Padaria.Models;
 using Padaria.Models.Enums;
 using Padaria.Models.ViewModels;
+using Padaria.Services;
+using System.Diagnostics;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Padaria.Controllers
 {
     public class ContasController : Controller
     {
-        private readonly PadariaContext _context;
+        private readonly ContaService _contaService;
+        private readonly ProdutoContaService _produtoContaService;
+        private readonly ProdutoService _produtoService;
 
-        public ContasController(PadariaContext context)
+        public ContasController(ContaService contaService, ProdutoContaService produtoContaService, ProdutoService produtoService)
         {
-
-            _context = context;
+            _produtoContaService = produtoContaService; 
+            _contaService = contaService;
+            _produtoService = produtoService;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var encomendas = _context.Conta.Where(e => (e as Encomenda).Status == Status.Andamento);
+            
 
-            var contas = _context.Conta.Except(encomendas).OrderByDescending(c => c.Data).ToList();
+            var contas = await _contaService.FindAllAsync();
             return View(contas);
         }
 
@@ -29,15 +34,15 @@ namespace Padaria.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(List<ProdutoConta> p, Conta conta)
+        public async Task<IActionResult> Create(List<ProdutoConta> p, Conta conta)
         {
 
             var produtoConta = new ProdutoConta();
 
             foreach (var item in p)
             {
-                produtoConta = _context.ProdutosConta.FirstOrDefault(p => p.ProdutoId == item.ProdutoId && p.Quantidade == item.Quantidade);
-                var produto = _context.Produto.FirstOrDefault(pr => pr.Id == item.Produto.Id);
+                produtoConta = await _produtoContaService.FindAsync(item);
+                var produto = await _produtoService.FindByIdAsync(item.ProdutoId);
                 
                     if (produtoConta == null)
                     {
@@ -59,9 +64,7 @@ namespace Padaria.Controllers
             }
 
             
-            _context.Add(conta);
-
-            _context.SaveChanges();
+            await _contaService.AddConta(conta);
 
             return RedirectToAction("Index", "Home");
 
@@ -71,20 +74,12 @@ namespace Padaria.Controllers
        
         
 
-        public IActionResult Search(DateTime dataInicial, DateTime? dataFinal)
+        public async Task<IActionResult> Search(DateTime dataInicial, DateTime? dataFinal)
         {
-            List<Conta> contas = new List<Conta>();
-            if (dataFinal != null)
-            {
-                contas = _context.Conta.Where(c => c.Data.Date >= dataInicial && c.Data.Date <= dataFinal).OrderByDescending(c => c.Data).ToList();
-               
-            }
-            else
-            {
-                contas = _context.Conta.Where(c => c.Data.Date == dataInicial).OrderByDescending(c => c.Data).ToList();
-                
+            
+            
+           var contas = await _contaService.SearchByDateAsync(dataInicial, dataFinal); 
 
-            }
             ViewBag.DataInicial = dataInicial;
             ViewBag.DataFinal = dataFinal;
 
@@ -92,14 +87,23 @@ namespace Padaria.Controllers
 
         }
 
-        public IActionResult Details(int? id)
+        public async Task<IActionResult> Details(int? id)
         {
-            var conta = _context.Conta.Include(c => c.Produtos).ThenInclude(c => c.Produto).FirstOrDefault(c => c.Id == id);
+            if (id == null)
+            {
+                return RedirectToAction(nameof(Error), new { message = "id não recebido" });
+            }
+            
+                var conta = await _contaService.FindByIdAsync(id.Value);
+            if (conta == null)
+            {
+                return RedirectToAction(nameof(Error), new { message = "Id não encontrado" });
+            }
 
             return View(conta);
         }
 
-        public IActionResult Report(List<int> id)
+        public async Task<IActionResult> Report(List<int> id)
         {
             
             List<ProdutoConta> produtos = new List<ProdutoConta>();
@@ -107,7 +111,7 @@ namespace Padaria.Controllers
             
             foreach(var item in id)
             {
-                var c = _context.Conta.Include(c => c.Produtos).ThenInclude(c => c.Produto).FirstOrDefault(c => c.Id == item);
+                var c = await _contaService.FindByIdAsync(item);
                 conta.Add(c);   
                 foreach (var i in c.Produtos)
                 {
@@ -122,6 +126,17 @@ namespace Padaria.Controllers
               
 
             return View(contagem);
+        }
+
+        public IActionResult Error(string message)
+        {
+            var viewModel = new ErrorViewModel
+            {
+                Message = message,
+                RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
+
+            };
+            return View(viewModel);
         }
     }
 

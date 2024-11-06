@@ -36,6 +36,10 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<ProdutoContaService>();
+builder.Services.AddScoped<ClienteService>();
+builder.Services.AddScoped<ProdutoService>();
+builder.Services.AddScoped<ContaService>();
+builder.Services.AddScoped<EncomendaService>();
 
 var app = builder.Build();
 

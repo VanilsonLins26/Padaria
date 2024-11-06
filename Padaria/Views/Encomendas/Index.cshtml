@@ -74,8 +74,8 @@
                                                 <p><strong>Valor Total:</strong> @Html.DisplayFor(modelItem => item.ValorTotal)</p>
                                                 <input type="hidden" name="id" value="@item.Id" />
                                                 <div class="mb-3">
-                                                   
-                                                    <p><strong>Valor a pagar:</strong> R$ @((item.ValorTotal - item.ValorAntecipado).ToString("F2"))</p>
+
+                                                    <p><strong>Valor a pagar:</strong> R$ @((item.ValorTotal - (item.ValorAntecipado ?? 0)).ToString("F2"))</p>
                                                     
                                                 </div>
                                                 <div class="mb-3">

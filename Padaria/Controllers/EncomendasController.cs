@@ -16,25 +16,28 @@ namespace Padaria.Controllers
     public class EncomendasController : Controller
     {
 
-        public readonly PadariaContext _context;
+        public readonly EncomendaService _encomendaService;
         public readonly ProdutoContaService _produtoContaService;
-
-        public EncomendasController(PadariaContext context, ProdutoContaService produtoContaService)
+        public readonly ClienteService _clienteService;
+        public readonly ProdutoService _produtoService;
+        public EncomendasController(EncomendaService encomendaService, ProdutoContaService produtoContaService, ClienteService clienteService, ProdutoService produtoService)
         {
-            _context = context;
+            _encomendaService =encomendaService;
             _produtoContaService = produtoContaService;
+            _clienteService = clienteService;
+            _produtoService = produtoService;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            
-            var agrupamento = _context.Encomenda.Where(e=> e.Status == Status.Andamento).Include(e => e.Cliente).OrderBy(e => e.Data).GroupBy(e => e.Data.Date).ToList();
+
+            var agrupamento = await _encomendaService.GroupFindAsync();
             return View(agrupamento);
         }
 
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            var clientes = _context.Cliente.OrderBy(c => c.Nome).ToList();
+            var clientes = await _clienteService.FindAllAsync();
             var e = new EncomendaViewModel { Clientes = clientes };
 
            
@@ -46,15 +49,15 @@ namespace Padaria.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(Encomenda encomenda)
+        public async Task<IActionResult> Create(Encomenda encomenda)
         {
-            if (!ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 var item = encomenda.Produtos;
                 for (int i = 0; i < item.Count; i++)
                 {
-                    var produto = _context.Produto.FirstOrDefault(p => p.Id == item[i].ProdutoId);
-                    var pc = _context.ProdutosConta.FirstOrDefault(pc => pc.Quantidade == item[i].Quantidade && pc.Produto == produto);
+                    var produto = await _produtoService.FindByIdAsync(item[i].ProdutoId);
+                    var pc = await _produtoContaService.FindAsync(item[i]);
 
                     produto.QntDisponiveis -= item[i].Quantidade;
                     produto.QntVendidas += item[i].Quantidade;
@@ -72,24 +75,32 @@ namespace Padaria.Controllers
                 }
 
 
-                var cliente = _context.Cliente.Where(c => c.Id == encomenda.Cliente.Id).FirstOrDefault();
+                var cliente = await _clienteService.FindByIdAsync(encomenda.ClientId);
                 encomenda.Cliente = cliente;
-                _context.Add(encomenda);
-                _context.SaveChanges();
+               await _encomendaService.AddAsync(encomenda);
                 return RedirectToAction(nameof(Index));
             }
-            return View(encomenda);
+            var c = await _clienteService.FindAllAsync();
+            var e = new EncomendaViewModel {Encomenda = encomenda, Clientes = c };
+            foreach (var modelError in ModelState.Values.SelectMany(v => v.Errors))
+            {
+                // Aqui você pode logar ou simplesmente exibir o erro
+                Console.WriteLine(modelError.ErrorMessage);
+                
+            }
+
+            return View(e);
 
         }
 
-        public IActionResult AddProduto(string? codigo, EncomendaViewModel? encomenda)
+        public async Task<IActionResult> AddProduto(string? codigo, EncomendaViewModel? encomenda)
         {
 
             if (codigo != null)
             {
 
 
-                var produto = _context.Produto.FirstOrDefault(p => p.Codigo.Equals(codigo));
+                var produto = await _produtoService.FindByCodeAsync(codigo);
 
                 if (produto == null)
                 {
@@ -113,7 +124,7 @@ namespace Padaria.Controllers
             foreach (var item in encomenda.ProdutosConta)
             {
 
-                var p = _context.Produto.FirstOrDefault(p => p.Id == item.ProdutoId);
+                var p = await _produtoService.FindByIdAsync(item.ProdutoId);
                 item.Produto = p;
                 item.Total = _produtoContaService.ValorTotalProduto(item);
                 
@@ -130,12 +141,13 @@ namespace Padaria.Controllers
             }
 
 
-                var cliente = _context.Cliente.FirstOrDefault(c => c.Id == encomenda.Cliente.Id);
+                var cliente = await _clienteService.FindByIdAsync(encomenda.Cliente.Id);
             if (cliente == null)
             {
                 return NotFound();
             }
-            encomenda.Clientes.Add(cliente);    
+            encomenda.Clientes.Add(cliente);  
+           
             var total = encomenda.ProdutosConta.Sum(p => p.Total);
             ViewBag.Total = total;
             
@@ -147,9 +159,9 @@ namespace Padaria.Controllers
 
         }
 
-        public IActionResult SearchCLiente(string cliente)
+        public async Task<IActionResult> SearchCLiente(string cliente)
         {
-            var clientes = _context.Cliente.Where(c => c.Nome.Contains(cliente)).OrderBy(c => c.Nome).ToList();
+            var clientes = await _clienteService.FindByNameAsync(cliente);
             if (cliente.IsNullOrEmpty())
             {
                 return BadRequest();
@@ -159,47 +171,36 @@ namespace Padaria.Controllers
             return View(nameof(Create), e);
         }
 
-        public IActionResult Details(int id)
+        public async Task<IActionResult> Details(int id)
         {
-            var encomenda = _context.Encomenda.Include(e => e.Cliente).Include(e => e.Produtos).ThenInclude(p => p.Produto).FirstOrDefault(e => e.Id == id);
+            var encomenda = await _encomendaService.FindById(id);
             return View(encomenda);
 
         }
 
-        public IActionResult ConfirmarEntrega(int id, MetodoPagamento metodoPagamento)
+        public async Task<IActionResult> ConfirmarEntrega(int id, MetodoPagamento metodoPagamento)
         {
-            var enc = _context.Encomenda.FirstOrDefault(e => e.Id == id);    
+            var enc = await _encomendaService.FindById(id);   
             enc.Status = Status.Concluido;
             enc.MetodoPagamento = metodoPagamento;
             enc.Data = DateTime.Now;    
-            _context.Update(enc);
-            _context.SaveChanges(); 
+            await _encomendaService.UpdateAsync(enc);
             return RedirectToAction(nameof(Index));
 
         }
 
-        public IActionResult Completed()
+        public async Task<IActionResult> Completed()
         {
-            var concluidos = _context.Encomenda.Where(e=> e.Status == Status.Concluido).Include(e => e.Cliente).OrderByDescending(e => e.Data).ToList();    
+            var concluidos = await _encomendaService.FindAllCompleted();
             return View(concluidos);
 
 
         }
 
-        public IActionResult Search(DateTime dataInicial, DateTime? dataFinal)
+        public async Task<IActionResult> Search(DateTime dataInicial, DateTime? dataFinal)
         {
-            List<Encomenda> concluidos = new List<Encomenda>();
-            if (dataFinal != null)
-            {
-                concluidos = _context.Encomenda.Where(e => e.Data.Date >= dataInicial && e.Data.Date <= dataFinal && e.Status == Status.Concluido).OrderByDescending(e => e.Data).ToList();
-
-            }
-            else
-            {
-                concluidos = _context.Encomenda.Where(e => e.Data.Date == dataInicial && e.Status == Status.Concluido).OrderByDescending(e => e.Data).ToList();
-
-
-            }
+            var concluidos = await _encomendaService.FindCompletedByDate(dataInicial, dataFinal); 
+            
             ViewBag.DataInicial = dataInicial;
             ViewBag.DataFinal = dataFinal;
 

@@ -6,6 +6,12 @@
 
 <div class="container mt-5">
     <h1 class="text-center mb-4">@ViewData["Title"]</h1>
+    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+    {
+        <div class="text-danger">
+            @error.ErrorMessage
+        </div>
+    }
 
     <form asp-action="SearchCliente" class="mb-4 d-flex align-items-center">
         <input id="clienteInput" name="cliente" type="text" class="form-control me-2" placeholder="Digite o nome do cliente" style="width: 120px;" />
@@ -68,13 +74,15 @@
     @if (Model != null && ViewBag.Total != null)
     {
         <form asp-action="Create">
+            
             <div class="mb-3 d-flex align-items-center">
                 <label asp-for="@Model.Encomenda.Data" class="form-label me-2" style="margin-bottom: 0;">Entrega:</label>
                 <input asp-for="@Model.Encomenda.Data" class="form-control" style="width: 200px;" />
                 <span asp-validation-for="@Model.Encomenda.Data" class="text-danger"></span>
                 <input type="hidden" asp-for="@Model.Encomenda.DataPedido" value="@DateTime.Now" />
-                <input type="hidden" asp-for="@Model.Encomenda.MetodoPagamento" value="0" />
-                <input type="hidden" asp-for="@Model.Encomenda.Status" value="0" />
+                <input type="hidden" asp-for="@Model.Encomenda.MetodoPagamento" value="@Padaria.Models.Enums.MetodoPagamento.Debito" />
+                <input type="hidden" asp-for="@Model.Encomenda.Status" value="@Padaria.Models.Enums.Status.Andamento" />
+                <input type="" asp-for="@Model.ClienteId" value="@Model.Clientes.FirstOrDefault().Id" />
             </div>
 
             <div class="mb-3 d-flex align-items-center">
@@ -86,7 +94,7 @@
             <div class="mb-3 d-flex align-items-center">
                 <label asp-for="@Model.Encomenda.ValorAntecipado" class="form-label me-2" style="margin-bottom: 0;">Valor antecipado: R$</label>
                 <input type="text" asp-for="@Model.Encomenda.ValorAntecipado" id="valorParcial" class="form-control" value="0.00" style="width: 80px;" />
-                
+                <span asp-validation-for="@Model.Encomenda.ValorAntecipado" class="text-danger"></span>
             </div>
 
             <div class="mb-3 d-flex align-items-center">
@@ -97,10 +105,11 @@
 
             @for (int i = 0; i < Model.ProdutosConta.Count; i++)
             {
-                <input type="hidden" asp-for="@Model.Encomenda.Produtos[i].Quantidade" value="@Model.ProdutosConta[i].Quantidade" />
-                <input type="hidden" asp-for="@Model.Encomenda.Produtos[i].ProdutoId" value="@Model.ProdutosConta[i].ProdutoId" />
-                <input type="hidden" asp-for="@Model.Encomenda.Produtos[i].Total" value="@Model.ProdutosConta[i].Total" />
-                <input type="hidden" asp-for="@Model.Encomenda.Cliente.Id" value="@Model.Cliente.Id" />
+                
+                <input type="hidden" asp-for="@Model.ProdutosConta[i].Total" value="@Model.ProdutosConta[i].Total" />
+                
+                
+                
             }
 
             <button type="submit" class="btn btn-success">Finalizar</button>

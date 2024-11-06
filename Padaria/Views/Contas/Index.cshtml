@@ -18,50 +18,49 @@
         </div>
     </form>
 
-    <div class="table-responsive">
-        <table class="table table-striped table-hover">
-            <thead class="table-dark">
-                <tr>
-                    <th>@Html.DisplayNameFor(model => model.Id)</th>
-                    <th>@Html.DisplayNameFor(model => model.Data)</th>
-                    <th>@Html.DisplayNameFor(model => model.ValorTotal)</th>
-                    <th>@Html.DisplayNameFor(model => model.MetodoPagamento)</th>
-                </tr>
-            </thead>
-            <tbody>
-                <form asp-action="Report">
+    
+    <form asp-action="Report" method="post">
+        <div class="text-center mb-3">
+            <button type="submit" class="btn btn-success">Gerar Relatório</button>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>@Html.DisplayNameFor(model => model.Id)</th>
+                        <th>@Html.DisplayNameFor(model => model.Data)</th>
+                        <th>@Html.DisplayNameFor(model => model.ValorTotal)</th>
+                        <th>@Html.DisplayNameFor(model => model.MetodoPagamento)</th>
+                    </tr>
+                </thead>
+                <tbody>
                     @foreach (var item in Model)
                     {
                         var rowClass = item is Encomenda ? "table-success" : "";
                         var controller = item is Encomenda ? "Encomendas" : "Contas";
-                    <tr class="@rowClass">
-                        <td>
-                            <a asp-action="Details" asp-controller="@controller" asp-route-id="@item.Id">@Html.DisplayFor(modelItem => item.Id)</a>
-                        </td>
-                        <td>
+                        <tr class="@rowClass">
+                            <td>
+                                <a asp-action="Details" asp-controller="@controller" asp-route-id="@item.Id">@Html.DisplayFor(modelItem => item.Id)</a>
+                            </td>
+                            <td>
                                 @Html.DisplayFor(modelItem => item.Data)
-                        </td>
-                        <td>
+                            </td>
+                            <td>
                                 @Html.DisplayFor(modelItem => item.ValorTotal)
-                        </td>
-                        <td>
+                            </td>
+                            <td>
                                 @Html.DisplayFor(modelItem => item.MetodoPagamento)
-                        </td>
-                    </tr>
+                            </td>
+                        </tr>
                     }
 
                     @for (int i = 0; i < contasList.Count; i++)
                     {
-                    <input type="hidden" name="id" value="@contasList[i].Id" />
+                        <input type="hidden" name="id" value="@contasList[i].Id" />
                     }
-
-                <tr>
-                    <td colspan="4" class="text-center">
-                        <button type="submit" class="btn btn-success">Gerar Relatório</button>
-                    </td>
-                </tr>
-                </form>
-            </tbody>
-        </table>
-    </div>
+                </tbody>
+            </table>
+        </div>
+    </form>
 </div>

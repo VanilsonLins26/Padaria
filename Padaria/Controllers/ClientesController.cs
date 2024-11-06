@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using NuGet.Protocol.Plugins;
 using Padaria.Models;
 using Padaria.Models.ViewModels;
+using Padaria.Services;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Padaria.Controllers
 {
@@ -10,28 +13,27 @@ namespace Padaria.Controllers
        
     {
 
-        private readonly PadariaContext _context;
+        private readonly ClienteService _clienteService;
 
-        public ClientesController(PadariaContext context)
+        public ClientesController(ClienteService clienteService)
         {
 
-            _context = context;
+            _clienteService = clienteService;
 
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var clientes = _context.Cliente.ToList();   
+            var clientes = await _clienteService.FindAllAsync();   
             var c = new ClientFormView { Clientes = clientes };
             return View(c);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(Cliente cliente)
+        public async Task<IActionResult> Create(Cliente cliente)
         {
-            _context.Cliente.Add(cliente);
-            _context.SaveChanges();
+            await _clienteService.InsertAsync(cliente);   
             return RedirectToAction(nameof(Create), "Encomendas");
 
         }
@@ -39,39 +41,50 @@ namespace Padaria.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(int id, Cliente cliente)
+        public async Task<IActionResult> Edit(int id, Cliente cliente)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
 
+                return RedirectToAction(nameof(Index));
 
-
-                _context.Update(cliente);
-                _context.SaveChanges();
+               
                 
 
             }
-            return RedirectToAction(nameof(Index));
+            
+            try
+            {
+                await _clienteService.UpdateAsync(cliente);
+                return RedirectToAction(nameof(Index));
+            }
+            catch (ApplicationException e)
+            {
+                return RedirectToAction(nameof(Error), new { message = e.Message });
+            }
+
+
+            
+           
 
 
         }
 
-        public IActionResult Details(int id)
+        public async Task<IActionResult> DetailsAsync(int id)
         {
 
-            var cliente = _context.Cliente.Include(c => c.Encomendas).FirstOrDefault(c => c.Id == id);
-            cliente.Encomendas = cliente.Encomendas.OrderByDescending(e => e.Data).ToList();
+            var cliente = await _clienteService.FindByIdAsync(id);
             return View(cliente);
 
         }
 
-        public IActionResult Search(string nome)
+        public async Task<IActionResult> Search(string nome)
         {
             if(nome == null)
             {
                 return RedirectToAction(nameof(Index));
             }
-            var clientes = _context.Cliente.Where(c => c.Nome.Contains(nome)).ToList();
+            var clientes = await _clienteService.FindByNameAsync(nome);
             var c = new ClientFormView { Clientes = clientes };
             return View(nameof(Index) ,c);  
 

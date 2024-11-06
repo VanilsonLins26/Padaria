@@ -11,12 +11,12 @@ namespace Padaria.Models
         public DateTime DataPedido { get; set; }
         
         public Cliente? Cliente { get; set; }
-        [Required(ErrorMessage = "Insira um cliente")]
+       
         public int ClientId { get; set; }
         public Status Status { get; set; }
         [Display(Name ="Observações")]
         public string? Obs { get; set; }
-        public double ValorAntecipado { get; set; }
+        public double? ValorAntecipado { get; set; }
 
 
         public Encomenda() { }

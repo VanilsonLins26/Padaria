@@ -35,7 +35,18 @@ namespace Padaria.Services
 
         public async Task<Produto> FindByCodeAsync(string codigo)
         {
-           return await _context.Produto.FirstOrDefaultAsync(p => p.Codigo.Equals(codigo));
+            if(codigo.Length < 8)
+           return await _context.Produto.FirstOrDefaultAsync(p => p.Id == int.Parse(codigo));
+
+            else
+                return await _context.Produto.FirstOrDefaultAsync(p => p.Codigo.Equals(codigo));
+        }
+
+        
+
+        public async Task<ProdutoConta> FindAsync(ProdutoConta pc)
+        {
+           return await _context.ProdutosConta.FirstOrDefaultAsync(p => p.ProdutoId == pc.ProdutoId && p.Quantidade == pc.Quantidade);
         }
     }
 

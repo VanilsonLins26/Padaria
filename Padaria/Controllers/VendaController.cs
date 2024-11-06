@@ -10,12 +10,12 @@ namespace Padaria.Controllers
     public class VendaController : Controller
     {
         private readonly ProdutoContaService _produtoContaService;
-        private readonly PadariaContext _context;
+        
 
-        public VendaController( PadariaContext context, ProdutoContaService produtoContaService)
+        public VendaController(ProdutoContaService produtoContaService)
         {
             
-            _context = context;
+            
             _produtoContaService = produtoContaService;
         }
 

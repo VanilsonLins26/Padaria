@@ -10,13 +10,13 @@ namespace Padaria.Models
 
         [Required(ErrorMessage ="Insira uma data")]
         public DateTime Data { get; set; }
-        public List<ProdutoConta> Produtos  { get; set; } = new List<ProdutoConta>();  
+        public List<ProdutoConta>? Produtos  { get; set; } = new List<ProdutoConta>();  
         
 
         [Display(Name ="Valor Total")]
         [DataType(DataType.Currency)]
         public double ValorTotal { get; set; }
-        public MetodoPagamento MetodoPagamento { get; set; }
+        public MetodoPagamento? MetodoPagamento { get; set; }
 
         public Conta() { }
 
