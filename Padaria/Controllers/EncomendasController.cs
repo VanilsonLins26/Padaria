@@ -51,31 +51,47 @@ namespace Padaria.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Encomenda encomenda)
         {
+
+            if (encomenda.Produtos.Count == 0)
+            {
+                return NotFound();
+            }
             if (ModelState.IsValid)
             {
                 var item = encomenda.Produtos;
                 for (int i = 0; i < item.Count; i++)
                 {
-                    var produto = await _produtoService.FindByIdAsync(item[i].ProdutoId);
+                    
                     var pc = await _produtoContaService.FindAsync(item[i]);
 
-                    produto.QntDisponiveis -= item[i].Quantidade;
-                    produto.QntVendidas += item[i].Quantidade;
-                    if (produto.QntDisponiveis < 0)
-                    {
-                        produto.QntDisponiveis = 0;
-                    }
                     if (pc != null)
                     {
                         item[i] = pc;
+                    }
+                    else
+                    {
+                        var produto = await _produtoService.FindByIdAsync(item[i].Produto.Id);
+                        item[i].Produto = produto;
+                    }
+
+                    item[i].Produto.QntDisponiveis -= item[i].Quantidade;
+                    item[i].Produto.QntVendidas += item[i].Quantidade;
+                    if (item[i].Produto.QntDisponiveis < 0)
+                    {
+                        item[i].Produto.QntDisponiveis = 0;
                     }
 
 
 
                 }
 
-
+                
+                if(encomenda.ClientId == 0)
+                {
+                    return NotFound();
+                }
                 var cliente = await _clienteService.FindByIdAsync(encomenda.ClientId);
+                
                 encomenda.Cliente = cliente;
                await _encomendaService.AddAsync(encomenda);
                 return RedirectToAction(nameof(Index));
@@ -84,7 +100,7 @@ namespace Padaria.Controllers
             var e = new EncomendaViewModel {Encomenda = encomenda, Clientes = c };
             foreach (var modelError in ModelState.Values.SelectMany(v => v.Errors))
             {
-                // Aqui você pode logar ou simplesmente exibir o erro
+                
                 Console.WriteLine(modelError.ErrorMessage);
                 
             }
@@ -95,7 +111,7 @@ namespace Padaria.Controllers
 
         public async Task<IActionResult> AddProduto(string? codigo, EncomendaViewModel? encomenda)
         {
-
+            
             if (codigo != null)
             {
 
@@ -141,11 +157,8 @@ namespace Padaria.Controllers
             }
 
 
-                var cliente = await _clienteService.FindByIdAsync(encomenda.Cliente.Id);
-            if (cliente == null)
-            {
-                return NotFound();
-            }
+                var cliente = await _clienteService.FindByIdAsync(encomenda.ClienteId);
+            
             encomenda.Clientes.Add(cliente);  
            
             var total = encomenda.ProdutosConta.Sum(p => p.Total);
@@ -158,8 +171,8 @@ namespace Padaria.Controllers
             return View(nameof(Create), encomenda);
 
         }
-
-        public async Task<IActionResult> SearchCLiente(string cliente)
+       
+            public async Task<IActionResult> SearchCLiente(string cliente)
         {
             var clientes = await _clienteService.FindByNameAsync(cliente);
             if (cliente.IsNullOrEmpty())
@@ -208,6 +221,43 @@ namespace Padaria.Controllers
 
         }
 
+        public async Task<IActionResult> Edit(int id)
+        {
+            if (id == 0)
+            {
+                return NotFound();
+            }
+            var encomenda = await _encomendaService.FindById(id);
+            
+
+            return View(encomenda);
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(Encomenda encomenda)
+        { 
+            if (encomenda == null)
+            {
+                return NotFound();
+            }
+
+            await _encomendaService.UpdateAsync(encomenda);
+
+            return RedirectToAction(nameof(Index));
+           
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Remove(int id)
+        {
+            
+            await _encomendaService.RemoveAsync(id);
+            return RedirectToAction(nameof(Index));
+        }
 
     }
 }

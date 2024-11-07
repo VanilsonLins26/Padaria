@@ -17,13 +17,18 @@ namespace Padaria.Services
 
         public async Task<Produto> FindByIdAsync(int id)
         {
+
             return await _context.Produto.FirstOrDefaultAsync(pr => pr.Id == id);
 
         }
 
         public async Task<Produto> FindByCodeAsync(String codigo)
         {
+            if(codigo.Length >=8)
             return await _context.Produto.FirstOrDefaultAsync(pr => pr.Codigo.Equals(codigo));
+
+            else
+                return await _context.Produto.FirstOrDefaultAsync(pr => pr.Id == int.Parse(codigo));
 
         }
 
@@ -66,9 +71,9 @@ namespace Padaria.Services
           return await _context.Produto.Where(p => p.Nome.Contains(nome)).ToListAsync();
         }
 
-        public async Task<bool> AnyAsync(int id)
+        public async Task<bool> AnyAsync(Produto produto)
         {
-           return await _context.Produto.AnyAsync(e => e.Id == id);
+           return await _context.Produto.AnyAsync(e => e.Codigo == produto.Codigo && e.Id != produto.Id);
         }
     }
 }

@@ -45,16 +45,26 @@ namespace Padaria.Services
         {
             if (dataFinal != null)
             {
-               return await _context.Encomenda.Where(e => e.Data.Date >= dataInicial && e.Data.Date <= dataFinal && e.Status == Status.Concluido).OrderByDescending(e => e.Data).ToListAsync();
+               return await _context.Encomenda.Include(e => e.Cliente).Where(e => e.Data.Date >= dataInicial && e.Data.Date <= dataFinal && e.Status == Status.Concluido).OrderByDescending(e => e.Data).ToListAsync();
 
             }
             else
             {
-                return await _context.Encomenda.Where(e => e.Data.Date == dataInicial && e.Status == Status.Concluido).OrderByDescending(e => e.Data).ToListAsync();
+                return await _context.Encomenda.Include(e => e.Cliente).Where(e => e.Data.Date == dataInicial && e.Status == Status.Concluido).OrderByDescending(e => e.Data).ToListAsync();
 
 
             }
 
+        }
+
+       public async Task RemoveAsync(int id)
+        {
+           var encomenda = await FindById(id);
+            encomenda.Cliente = null;   
+            encomenda.Produtos = null;
+            _context.Update(encomenda);
+            _context.Remove(encomenda); 
+           await _context.SaveChangesAsync();
         }
     }
 }

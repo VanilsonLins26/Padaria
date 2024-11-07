@@ -6,6 +6,8 @@ namespace Padaria.Models
 {
     public class Produto
     {
+
+
         public int Id { get; set; }
         [Required(ErrorMessage ="Insira um código")]
         public string Codigo { get; set; }

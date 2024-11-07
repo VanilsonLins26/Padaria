@@ -1,0 +1,127 @@
+﻿@model Encomenda
+
+@{
+    ViewData["Title"] = "Nova Encomenda";
+}
+
+<div class="container mt-5">
+    <h1 class="text-center mb-4">@ViewData["Title"]</h1>
+
+
+
+ 
+
+    <form asp-action="AddProduto">
+        <div class="row mb-4 d-flex align-items-center">
+            <div class="col-md-8 d-flex align-items-center">
+                <label>Cliente : @Model.Cliente.Nome</label>
+
+                
+            </div>
+            
+        </div>
+
+
+
+
+        <div class="mb-4 d-flex align-items-center">
+            <input id="codigoInput" name="codigo" type="hidden" class="form-control me-2" placeholder="Código do produto" style="width: 150px;" autofocus />
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <span class="text-danger">@TempData["ErrorMessage"]</span>
+            }
+            <button id="adicionarBtn" class="btn btn-info" type="submit" style="display:none">Adicionar</button>
+        </div>
+
+        
+            <table class="table table-striped mt-3">
+                <thead>
+                    <tr>
+                        <th>Quantidade</th>
+                        <th>Produto</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.Produtos.Count; i++)
+                    {
+                        <tr>
+                            <td>
+                                <input type="text" asp-for="@Model.Produtos[i].Quantidade" value="@Model.Produtos[i].Quantidade" class="form-control quantidadeInput" style="width: 80px;" readonly/>
+                            </td>
+                            <td>@Html.DisplayFor(p => p.Produtos[i].Produto.Nome)</td>
+                            <td>@Html.DisplayFor(p => p.Produtos[i].Total)</td>
+                        </tr>
+                        <input type="hidden" asp-for="@Model.Produtos[i].ProdutoId" value="@Model.Produtos[i].ProdutoId" />
+                    }
+                </tbody>
+            </table>
+        
+    </form>
+
+    @if (Model != null)
+    {
+        <form asp-action="Edit">
+
+            <div class="mb-3 d-flex align-items-center">
+                <label asp-for="@Model.Data" class="form-label me-2" style="margin-bottom: 0;">Entrega:</label>
+                <input asp-for="@Model.Data" class="form-control" style="width: 200px;" />
+                <span asp-validation-for="@Model.Data" class="text-danger"></span>
+                <input type="hidden" asp-for="@Model.DataPedido" value="@DateTime.Now" />
+                <input type="hidden" asp-for="@Model.MetodoPagamento" value="@Padaria.Models.Enums.MetodoPagamento.Debito" />
+                <input type="hidden" asp-for="@Model.Status" value="@Padaria.Models.Enums.Status.Andamento" />
+                <input type="hidden" asp-for="@Model.ClientId" value="@Model.ClientId" />
+            </div>
+
+            <div class="mb-3 d-flex align-items-center">
+
+                <input asp-for="@Model.Obs" class="form-control" placeholder="Insira alguma observação, se necessário" />
+                <span asp-validation-for="@Model.Obs" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3 d-flex align-items-center">
+                <label asp-for="@Model.ValorAntecipado" class="form-label me-2" style="margin-bottom: 0;">Valor antecipado: R$</label>
+                <input type="text" asp-for="@Model.ValorAntecipado" id="valorParcial" class="form-control" value="@Model.ValorAntecipado" style="width: 80px;" />
+                <span asp-validation-for="@Model.ValorAntecipado" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3 d-flex align-items-center">
+                <label class="form-label me-2" style="margin-bottom: 0;">Total: R$</label>
+                <input type="text" asp-for="@Model.ValorTotal" id="total" class="form-control" value="@Model.ValorTotal" style="width: 80px;" />
+                <span asp-validation-for="@Model.ValorTotal" class="text-danger"></span>
+            </div>
+
+            
+
+            <button type="submit" class="btn btn-success">Finalizar</button>
+        </form>
+    }
+
+   
+</div>
+
+@section scripts {
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            
+            $('#total').mask('000.000.000.000.000,00', { reverse: true });
+            $('#valorParcial').mask('000.000.000.000.000,00', { reverse: true });
+
+
+            $('#codigoInput, .quantidadeInput').on('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    $('#adicionarBtn').click();
+                }
+            });
+        });
+
+    </script>
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script src="@Url.Content("~/js/jquery.validate.pt-BR.js")"></script>
+}

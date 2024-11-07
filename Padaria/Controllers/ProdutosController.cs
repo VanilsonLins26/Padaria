@@ -69,6 +69,12 @@ namespace Padaria.Controllers
         {
             if (ModelState.IsValid)
             {
+                var existe = await _produtoService.AnyAsync(produto);
+                if (existe)
+                {
+                    ModelState.AddModelError("Codigo", "Já existe um produto com este código");
+                    return View(produto);
+                }
                 await _produtoService.AddAsync(produto);
                 return RedirectToAction(nameof(Index));
 
@@ -104,6 +110,13 @@ namespace Padaria.Controllers
 
             if (ModelState.IsValid)
             {
+                
+                var existe = await _produtoService.AnyAsync(produto);
+                if (existe)
+                {
+                    ModelState.AddModelError("Codigo", "Já existe um produto com este código");
+                    return View(produto);
+                }
                 try
                 {
                     produto.QntDisponiveis += quantidade;

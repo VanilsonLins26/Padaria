@@ -11,7 +11,7 @@
         <div class="col-md-4">
             <div class="card text-white bg-primary shadow">
                 <div class="card-body">
-                    <h5 class="card-title">Quantidade de Vendas</h5>
+                    <h5 class="card-title">Quantidade</h5>
                     <p class="card-text fs-2">@ViewBag.Vendas</p>
                 </div>
             </div>
@@ -19,15 +19,16 @@
         <div class="col-md-4">
             <div class="card text-white bg-success shadow">
                 <div class="card-body">
-                    <h5 class="card-title">Total em Vendas</h5>
-                    <p class="card-text fs-2">R$ @ViewBag.Total.ToString("F2")</p>
+                    <h5 class="card-title">Total</h5>
+                   
+                    <p id="total" class="card-text fs-2">R$ @ViewBag.Total.ToString("#,0.00")</p>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
             <div class="card text-white bg-info shadow">
                 <div class="card-body">
-                    <h5 class="card-title">Valor Médio das Vendas</h5>
+                    <h5 class="card-title">Valor Médio</h5>
                     <p class="card-text fs-2">R$ @ViewBag.Media.ToString("F2")</p>
                 </div>
             </div>
@@ -59,3 +60,8 @@
         <a asp-action="Index" class="btn btn-secondary btn-lg">Voltar à Lista</a>
     </div>
 </div>
+
+            @section scripts {
+    
+    
+    }

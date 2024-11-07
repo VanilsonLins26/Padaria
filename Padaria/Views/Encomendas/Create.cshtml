@@ -6,13 +6,9 @@
 
 <div class="container mt-5">
     <h1 class="text-center mb-4">@ViewData["Title"]</h1>
-    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
-    {
-        <div class="text-danger">
-            @error.ErrorMessage
-        </div>
-    }
 
+   
+   
     <form asp-action="SearchCliente" class="mb-4 d-flex align-items-center">
         <input id="clienteInput" name="cliente" type="text" class="form-control me-2" placeholder="Digite o nome do cliente" style="width: 120px;" />
         <button class="btn btn-info" type="submit" style="display:none">Procurar</button>
@@ -21,7 +17,7 @@
     <form asp-action="AddProduto">
         <div class="row mb-4 d-flex align-items-center">
             <div class="col-md-8 d-flex align-items-center">
-                <select asp-for="@Model.Cliente.Id" asp-items="@(new SelectList(Model.Clientes, "Id", "Nome"))" class="form-select me-2" style="width: auto;">
+                <select asp-for="@Model.ClienteId" asp-items="@(new SelectList(Model.Clientes, "Id", "Nome"))" class="form-select me-2" style="width: auto;">
                     <option value="">Selecione o cliente</option>
                 </select>
 
@@ -29,14 +25,14 @@
                     Adicionar
                 </button>
             </div>
-            <span asp-validation-for="@Model.Cliente.Id" class="text-danger"></span>
+            <span asp-validation-for="@Model.ClienteId" class="text-danger"></span>
         </div>
 
 
 
 
         <div class="mb-4 d-flex align-items-center">
-            <input id="codigoInput" name="codigo" type="text" class="form-control me-2" placeholder="Código do produto" style="width: 150px;" />
+            <input id="codigoInput" name="codigo" type="text" class="form-control me-2" placeholder="Código do produto" style="width: 150px;" autofocus/>
             @if(TempData["ErrorMessage"] != null)
             {
                 <span class="text-danger">@TempData["ErrorMessage"]</span>
@@ -82,7 +78,7 @@
                 <input type="hidden" asp-for="@Model.Encomenda.DataPedido" value="@DateTime.Now" />
                 <input type="hidden" asp-for="@Model.Encomenda.MetodoPagamento" value="@Padaria.Models.Enums.MetodoPagamento.Debito" />
                 <input type="hidden" asp-for="@Model.Encomenda.Status" value="@Padaria.Models.Enums.Status.Andamento" />
-                <input type="" asp-for="@Model.ClienteId" value="@Model.Clientes.FirstOrDefault().Id" />
+                <input type="hidden" asp-for="@Model.Encomenda.ClientId" value="@Model.Clientes.FirstOrDefault().Id" />
             </div>
 
             <div class="mb-3 d-flex align-items-center">
@@ -106,9 +102,12 @@
             @for (int i = 0; i < Model.ProdutosConta.Count; i++)
             {
                 
-                <input type="hidden" asp-for="@Model.ProdutosConta[i].Total" value="@Model.ProdutosConta[i].Total" />
-                
-                
+                <input type="hidden" asp-for="@Model.Encomenda.Produtos[i].Quantidade" value="@Model.ProdutosConta[i].Quantidade" />              
+                <input type="hidden" asp-for="@Model.Encomenda.Produtos[i].Total" value="@Model.ProdutosConta[i].Total" />
+
+                <input type="hidden" asp-for="@Model.Encomenda.Produtos[i].Produto.Id" value="@Model.ProdutosConta[i].ProdutoId" />
+                <input type="hidden" asp-for="@Model.Encomenda.Produtos[i].Produto.Codigo" value="@Model.ProdutosConta[i].Produto.Codigo" />
+                <input type="hidden" asp-for="@Model.Encomenda.Produtos[i].Produto.Nome" value="@Model.ProdutosConta[i].Produto.Nome" />
                 
             }
 
