@@ -9,7 +9,7 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace Padaria.Controllers
 {
-    public class HomeController : Controller
+    public class VendasController : Controller
     {
         private readonly PadariaContext _context;
         private readonly IMemoryCache _cache;
@@ -17,7 +17,7 @@ namespace Padaria.Controllers
         private readonly ContaService _contaService;
         private readonly ProdutoService _produtoService;
 
-        public HomeController(ContaService contaService, ProdutoContaService produtoContaService, ProdutoService produtoService, IMemoryCache cache, PadariaContext context)
+        public VendasController(ContaService contaService, ProdutoContaService produtoContaService, ProdutoService produtoService, IMemoryCache cache, PadariaContext context)
         {
 
             _contaService = contaService;

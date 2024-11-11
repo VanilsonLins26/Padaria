@@ -185,9 +185,9 @@
 
     <script>
         $('#pessoa').selectize({
-            create: false   ,  // Permite criar novos itens
+            create: false   , 
             load: function (query, callback) {
-                // Realiza a pesquisa via AJAX
+               
                 $.ajax({
                     url: '@Url.Action("BuscarPessoas", "Encomendas")',
                     data: { term: query },
