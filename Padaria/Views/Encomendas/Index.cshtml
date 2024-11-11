@@ -8,7 +8,12 @@
     <h1 class="text-center mb-4">@ViewData["Title"]</h1>
 
     <div class="d-flex justify-content-end mb-4">
-        <a asp-action="Create" class="btn btn-primary me-2">Novo</a>
+        <form asp-action="Create" method="post">
+            <input type="hidden" name="DataPedido" value="@DateTime.Now" />
+            <input type="hidden" name="status" value="@Padaria.Models.Enums.StatusConta.NaoFinalizado" />
+            <button type="submit" class="btn btn-info">Novo</button>
+        </form>
+
         <a asp-action="Completed" class="btn btn-secondary">Concluídos</a>
     </div>
 
@@ -55,13 +60,13 @@
                                     <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#confirmacao-@item.Id">
                                         Confirmar Entrega
                                     </button>
-                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning">
+                                    <a asp-action="Create" asp-route-id="@item.Id" class="btn btn-warning">
                                         Editar
                                     </a>
                                     <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#RemoverEncomenda-@item.Id">
                                         Excluir
                                     </button>
-                                    
+
                                 </td>
                             </tr>
 
@@ -74,9 +79,21 @@
                                         </div>
                                         <form asp-action="ConfirmarEntrega">
                                             <div class="modal-body">
-                                                <p><strong>Valor Total:</strong> @Html.DisplayFor(modelItem => item.ValorTotal)</p>
+                                                <p>Total: R$ @((item.ValorTotal + item.Desconto).ToString("F2"))</p>
+                                                @if (item.ValorAntecipado != 0)
+                                                {
+                                                    <p>Valor Antecipado: - @Html.DisplayFor(modelItem => item.ValorAntecipado)</p>
+                                                }
+                                                @if (item.Desconto != 0)
+                                                {
+                                                    <p>Desconto: - @Html.DisplayFor(modelItem => item.Desconto)</p>
+                                                }
                                                 <input type="hidden" name="id" value="@item.Id" />
-                                                <p><strong>Valor a pagar:</strong> R$ @((item.ValorTotal - (item.ValorAntecipado ?? 0)).ToString("F2"))</p>
+                                                <p>
+                                                    <strong style="font-size: 1.5rem; font-weight: bold;">
+                                                        Valor a receber: R$ @((item.ValorTotal - (item.ValorAntecipado)).ToString("F2"))
+                                                    </strong>
+                                                </p>
                                                 <div class="mb-3">
                                                     <label for="metodoPagamento-@item.Id" class="form-label">Método de pagamento:</label>
                                                     <select id="metodoPagamento-@item.Id" name="metodoPagamento" class="form-select" asp-items="@Html.GetEnumSelectList<Padaria.Models.Enums.MetodoPagamento>()"></select>

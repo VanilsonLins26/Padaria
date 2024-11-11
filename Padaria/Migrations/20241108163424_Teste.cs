@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Padaria.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class Teste : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -23,7 +23,7 @@ namespace Padaria.Migrations
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     Nome = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Contato = table.Column<string>(type: "longtext", nullable: false)
+                    Contato = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
@@ -38,11 +38,14 @@ namespace Padaria.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    TipoId = table.Column<int>(type: "int", nullable: false),
+                    Codigo = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     Nome = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Preco = table.Column<double>(type: "double", nullable: false),
-                    Tipo = table.Column<int>(type: "int", nullable: false)
+                    ValorUnitario = table.Column<double>(type: "double", nullable: false),
+                    Tipo = table.Column<int>(type: "int", nullable: false),
+                    QntVendidas = table.Column<int>(type: "int", nullable: false),
+                    QntDisponiveis = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -57,12 +60,17 @@ namespace Padaria.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     Data = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    StatusConta = table.Column<int>(type: "int", nullable: false),
+                    MetodoPagamento = table.Column<int>(type: "int", nullable: true),
                     Discriminator = table.Column<string>(type: "varchar(13)", maxLength: 13, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    ContaId = table.Column<int>(type: "int", nullable: true),
-                    DataEntrega = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    DataPedido = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     ClienteId = table.Column<int>(type: "int", nullable: true),
-                    Status = table.Column<int>(type: "int", nullable: true)
+                    ClientId = table.Column<int>(type: "int", nullable: true),
+                    Status = table.Column<int>(type: "int", nullable: true),
+                    Obs = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ValorAntecipado = table.Column<double>(type: "double", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -71,12 +79,6 @@ namespace Padaria.Migrations
                         name: "FK_Conta_Cliente_ClienteId",
                         column: x => x.ClienteId,
                         principalTable: "Cliente",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Conta_Conta_ContaId",
-                        column: x => x.ContaId,
-                        principalTable: "Conta",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 })
@@ -89,8 +91,8 @@ namespace Padaria.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     ProdutoId = table.Column<int>(type: "int", nullable: false),
-                    Quantidade = table.Column<int>(type: "int", nullable: false),
-                    ContaId = table.Column<int>(type: "int", nullable: false)
+                    ContaId = table.Column<int>(type: "int", nullable: false),
+                    Quantidade = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -116,9 +118,9 @@ namespace Padaria.Migrations
                 column: "ClienteId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Conta_ContaId",
-                table: "Conta",
-                column: "ContaId",
+                name: "IX_Produto_Codigo",
+                table: "Produto",
+                column: "Codigo",
                 unique: true);
 
             migrationBuilder.CreateIndex(

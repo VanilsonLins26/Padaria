@@ -31,6 +31,13 @@ public class PadariaContext : DbContext
             foreignKey.DeleteBehavior = DeleteBehavior.Restrict;
         }
 
+        modelBuilder.Entity<ProdutoConta>()
+        .HasOne(p => p.Conta)
+        .WithMany(c => c.Produtos)
+        .HasForeignKey(p => p.ContaId)
+        .OnDelete(DeleteBehavior.Cascade);
+
+
 
     }
 

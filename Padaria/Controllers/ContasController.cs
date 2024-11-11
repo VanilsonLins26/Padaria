@@ -24,7 +24,7 @@ namespace Padaria.Controllers
 
         public async Task<IActionResult> Index()
         {
-            
+           await _contaService.CleanAsync();
 
             var contas = await _contaService.FindAllAsync();
             return View(contas);
@@ -32,47 +32,8 @@ namespace Padaria.Controllers
 
 
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(List<ProdutoConta> p, Conta conta)
-        {
-
-            var produtoConta = new ProdutoConta();
-
-            foreach (var item in p)
-            {
-                produtoConta = await _produtoContaService.FindAsync(item);
-                var produto = await _produtoService.FindByIdAsync(item.ProdutoId);
-                
-                    if (produtoConta == null)
-                    {
-
-                        produtoConta = new ProdutoConta { Produto = produto, Quantidade = item.Quantidade, Total = item.Total };
-
-
-                    }
-
-                    produto.QntDisponiveis -= item.Quantidade;
-                    produto.QntVendidas += item.Quantidade;
-                    if (produto.QntDisponiveis < 0)
-                    {
-                        produto.QntDisponiveis = 0;
-                    }
-
-                conta.Produtos.Add(produtoConta);
-
-            }
-
-            
-            await _contaService.AddConta(conta);
-
-            return RedirectToAction("Index", "Home");
-
-
-        }
-
        
-        
+
 
         public async Task<IActionResult> Search(DateTime dataInicial, DateTime? dataFinal)
         {
@@ -122,8 +83,16 @@ namespace Padaria.Controllers
             ViewBag.Total = conta.Sum(c => c.ValorTotal);
             ViewBag.Vendas = conta.Count();
             ViewBag.Media = ViewBag.Total/ViewBag.Vendas;
-             
-              
+            ViewBag.CountDinheiro = conta.Where(c => c.MetodoPagamento == MetodoPagamento.Dinheiro).Count();
+            ViewBag.TotalDinheiro = conta.Where(c => c.MetodoPagamento == MetodoPagamento.Dinheiro).Sum(c => c.ValorTotal);
+            ViewBag.CountPix = conta.Where(c => c.MetodoPagamento == MetodoPagamento.Pix).Count();
+            ViewBag.TotalPix = conta.Where(c => c.MetodoPagamento == MetodoPagamento.Pix).Sum(c => c.ValorTotal);
+            ViewBag.CountDebito = conta.Where(c => c.MetodoPagamento == MetodoPagamento.Debito).Count();
+            ViewBag.TotalDebito = conta.Where(c => c.MetodoPagamento == MetodoPagamento.Debito).Sum(c => c.ValorTotal);
+            ViewBag.CountCredito = conta.Where(c => c.MetodoPagamento == MetodoPagamento.Credito).Count();
+            ViewBag.TotalCredito = conta.Where(c => c.MetodoPagamento == MetodoPagamento.Credito).Sum(c => c.ValorTotal);
+
+
 
             return View(contagem);
         }

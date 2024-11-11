@@ -26,7 +26,7 @@
                 @Html.DisplayNameFor(model => model.First().Nome)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.First().Preco)
+                @Html.DisplayNameFor(model => model.First().ValorUnitario)
             </th>
             <th>Ações</th>
         </tr>
@@ -39,7 +39,7 @@
                     <a asp-action="Details" asp-route-id="@item.Id">@Html.DisplayFor(modelItem => item.Nome)</a>
                 </td>
                 <td>
-                    R$ @Html.DisplayFor(modelItem => item.Preco) / @Html.DisplayFor(modelItem => item.Tipo)
+                    R$ @Html.DisplayFor(modelItem => item.ValorUnitario) / @Html.DisplayFor(modelItem => item.Tipo)
                 </td>
                 <td>
                     <a class="btn btn-warning btn-sm" asp-action="Edit" asp-route-id="@item.Id">Editar</a>

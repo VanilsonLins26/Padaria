@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Padaria.Models.Enums;
 using Padaria.Models;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Padaria.Services
 {
@@ -14,39 +15,42 @@ namespace Padaria.Services
             _context = context;
         }
 
-        public double ValorTotalProduto(ProdutoConta produtoConta)
-        {
-            double total = total = produtoConta.Produto.Preco * produtoConta.Quantidade; ;
-            if (produtoConta.Produto.Tipo == Tipo.Unidade)
-            {
-                return total;   
-            }
-            
-              return  total /= 1000;
-            
 
 
-        }
 
-        public double ValorTotal(List<ProdutoConta> produtosConta)
-        {
-            return produtosConta.Sum(p => ValorTotalProduto(p));
-        }
 
         public async Task<Produto> FindByCodeAsync(string codigo)
         {
-            if(codigo.Length < 8)
-           return await _context.Produto.FirstOrDefaultAsync(p => p.Id == int.Parse(codigo));
+            if (codigo.Length < 8)
+                return await _context.Produto.FirstOrDefaultAsync(p => p.Id == int.Parse(codigo));
 
             else
                 return await _context.Produto.FirstOrDefaultAsync(p => p.Codigo.Equals(codigo));
         }
 
-        
 
-        public async Task<ProdutoConta> FindAsync(ProdutoConta pc)
+
+        public async Task<ProdutoConta> FindAsync(int id)
         {
-           return await _context.ProdutosConta.Include(pc =>pc.Produto).FirstOrDefaultAsync(p => p.ProdutoId == pc.Produto.Id && p.Quantidade == pc.Quantidade && p.Total == pc.Total);
+            return await _context.ProdutosConta.FirstOrDefaultAsync(pc => pc.ProdutoId == id);
+        }
+
+        public async Task<ProdutoConta> FindByIdAsync(int id)
+        {
+            return await _context.ProdutosConta.Include(pc => pc.Conta).FirstOrDefaultAsync(pc => pc.Id == id);
+        }
+
+        public async Task UpdateAsync(ProdutoConta pc)
+        {
+            _context.Update(pc);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task RemoveAsync(ProdutoConta pc)
+        {
+            
+            _context.Remove(pc);
+            await _context.SaveChangesAsync();  
         }
     }
 

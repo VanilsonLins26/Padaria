@@ -5,7 +5,7 @@
 namespace Padaria.Migrations
 {
     /// <inheritdoc />
-    public partial class teste3 : Migration
+    public partial class _112 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

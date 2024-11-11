@@ -75,5 +75,10 @@ namespace Padaria.Services
         {
            return await _context.Produto.AnyAsync(e => e.Codigo == produto.Codigo && e.Id != produto.Id);
         }
+
+        public void Detache(Produto produto)
+        {
+           _context.Entry(produto).State = EntityState.Detached;
+        }
     }
 }

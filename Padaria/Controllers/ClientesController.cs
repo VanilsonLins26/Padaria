@@ -29,14 +29,7 @@ namespace Padaria.Controllers
             return View(c);
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Cliente cliente)
-        {
-            await _clienteService.InsertAsync(cliente);   
-            return RedirectToAction(nameof(Create), "Encomendas");
-
-        }
+        
 
 
         [HttpPost]

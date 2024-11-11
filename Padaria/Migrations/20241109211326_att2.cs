@@ -5,24 +5,24 @@
 namespace Padaria.Migrations
 {
     /// <inheritdoc />
-    public partial class AttEncomenda1 : Migration
+    public partial class att2 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<double>(
-                name: "ValorAntecipado",
-                table: "Conta",
-                type: "double",
-                nullable: true);
+            migrationBuilder.DropColumn(
+                name: "ClientId",
+                table: "Conta");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "ValorAntecipado",
-                table: "Conta");
+            migrationBuilder.AddColumn<int>(
+                name: "ClientId",
+                table: "Conta",
+                type: "int",
+                nullable: true);
         }
     }
 }

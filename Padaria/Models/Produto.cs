@@ -17,7 +17,7 @@ namespace Padaria.Models
         [DisplayFormat(DataFormatString ="{0:F2}")]
         [DataType(DataType.Currency)]
         [Required(ErrorMessage = "Insira o preço")]
-        public double Preco { get; set; }
+        public double ValorUnitario { get; set; }
         [Required(ErrorMessage = "Insira o tipo")]
         public Tipo Tipo { get; set; }
         public int QntVendidas { get; set; }    
@@ -26,11 +26,11 @@ namespace Padaria.Models
 
         public Produto() { }
 
-        public Produto(int id, string codigo, string nome, double preco, Tipo tipo, int qntVendidas, int qntDisponiveis)
+        public Produto(int id, string codigo, string nome, double valorUnitario, Tipo tipo, int qntVendidas, int qntDisponiveis)
         {
             Codigo = codigo;
             Nome = nome;
-            Preco = preco;
+            ValorUnitario = valorUnitario;
             Tipo = tipo;
             Id = id;
             QntDisponiveis = qntDisponiveis;

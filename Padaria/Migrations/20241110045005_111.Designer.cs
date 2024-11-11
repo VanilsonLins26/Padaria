@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Padaria.Migrations
 {
     [DbContext(typeof(PadariaContext))]
-    [Migration("20241023155407_AddMetodoPagamento")]
-    partial class AddMetodoPagamento
+    [Migration("20241110045005_111")]
+    partial class _111
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -34,7 +34,8 @@ namespace Padaria.Migrations
 
                     b.Property<string>("Contato")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
 
                     b.Property<string>("Nome")
                         .IsRequired()
@@ -61,11 +62,11 @@ namespace Padaria.Migrations
                         .HasMaxLength(13)
                         .HasColumnType("varchar(13)");
 
-                    b.Property<int>("MetodoPagamento")
+                    b.Property<int?>("MetodoPagamento")
                         .HasColumnType("int");
 
-                    b.Property<double>("ValorTotal")
-                        .HasColumnType("double");
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -86,24 +87,33 @@ namespace Padaria.Migrations
 
                     b.Property<string>("Codigo")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("Nome")
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<double>("Preco")
-                        .HasColumnType("double");
+                    b.Property<int?>("QntDisponiveis")
+                        .HasColumnType("int");
+
+                    b.Property<int>("QntVendidas")
+                        .HasColumnType("int");
 
                     b.Property<int>("Tipo")
                         .HasColumnType("int");
 
+                    b.Property<double>("ValorUnitario")
+                        .HasColumnType("double");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("Codigo")
+                        .IsUnique();
 
                     b.ToTable("Produto");
                 });
 
-            modelBuilder.Entity("Padaria.Models.ProdutosConta", b =>
+            modelBuilder.Entity("Padaria.Models.ProdutoConta", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -111,7 +121,7 @@ namespace Padaria.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("ContaId")
+                    b.Property<int>("ContaId")
                         .HasColumnType("int");
 
                     b.Property<int>("ProdutoId")
@@ -120,7 +130,7 @@ namespace Padaria.Migrations
                     b.Property<int>("Quantidade")
                         .HasColumnType("int");
 
-                    b.Property<double>("Total")
+                    b.Property<double>("ValorUnitario")
                         .HasColumnType("double");
 
                     b.HasKey("Id");
@@ -139,29 +149,27 @@ namespace Padaria.Migrations
                     b.Property<int>("ClienteId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ContaId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("DataEntrega")
+                    b.Property<DateTime>("DataPedido")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
+                    b.Property<string>("Obs")
+                        .HasColumnType("longtext");
+
+                    b.Property<double?>("ValorAntecipado")
+                        .HasColumnType("double");
 
                     b.HasIndex("ClienteId");
-
-                    b.HasIndex("ContaId")
-                        .IsUnique();
 
                     b.HasDiscriminator().HasValue("Encomenda");
                 });
 
-            modelBuilder.Entity("Padaria.Models.ProdutosConta", b =>
+            modelBuilder.Entity("Padaria.Models.ProdutoConta", b =>
                 {
                     b.HasOne("Padaria.Models.Conta", "Conta")
                         .WithMany("Produtos")
                         .HasForeignKey("ContaId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Padaria.Models.Produto", "Produto")
                         .WithMany("Produtos")
@@ -182,15 +190,7 @@ namespace Padaria.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Padaria.Models.Conta", "Conta")
-                        .WithOne("Encomenda")
-                        .HasForeignKey("Padaria.Models.Encomenda", "ContaId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.Navigation("Cliente");
-
-                    b.Navigation("Conta");
                 });
 
             modelBuilder.Entity("Padaria.Models.Cliente", b =>
@@ -200,8 +200,6 @@ namespace Padaria.Migrations
 
             modelBuilder.Entity("Padaria.Models.Conta", b =>
                 {
-                    b.Navigation("Encomenda");
-
                     b.Navigation("Produtos");
                 });
 

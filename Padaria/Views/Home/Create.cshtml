@@ -1,0 +1,131 @@
+﻿@model Conta
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="container mt-4">
+    <h1 class="text-center text-primary mb-4">Sistema de Vendas</h1>
+
+    <form asp-action="AddProduto">
+        <div class="mb-4 d-flex justify-content-center">
+            <div class="input-group" style="max-width: 400px;">
+                <input type="search" name="codigo" class="form-control" autofocus placeholder="Escaneie ou digite o código" />
+                <button class="btn btn-success" type="submit">
+                    <i class="bi bi-plus-circle"></i> Adicionar Produto
+                </button>
+            </div>
+        </div>
+
+        <div class="text-center text-danger">@TempData["Error"]</div>
+        <input type="hidden" asp-for="@Model.Id" value="@Model.Id" />
+    </form>
+
+    @if (Model.Produtos != null && Model.Produtos.Count > 0)
+    {
+        <table class="table table-hover table-bordered mb-4">
+            <thead>
+                <tr class="table-secondary">
+                    <th scope="col">Quantidade</th>
+                    <th scope="col">Produto</th>
+                    <th scope="col">Valor Unitário</th>
+                    <th scope="col">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Produtos)
+                {
+                    <form asp-action="ChangeQuantity" method="post">
+                    <tr>
+                        <td>
+                            <input name="Quantidade" class="form-control" value="@item.Quantidade" />
+                            <input type="hidden" name="ProdutoId" value="@item.ProdutoId" />
+                            <input type="hidden" name="Id" value="@item.Id" />
+                            <input type="hidden" name="ValorUnitario" value="@item.ValorUnitario" />
+                            <input type="hidden" name="ContaId" value="@item.ContaId" />
+                        </td>
+                        <td>@Html.DisplayFor(modelitem => item.Produto.Nome)</td>
+                        <td>@Html.DisplayFor(modelitem => item.ValorUnitario)</td>
+                        <td>@Html.DisplayFor(modelitem => item.Total)</td>
+                    </tr>
+                    </form>
+                }
+            </tbody>
+        </table>
+
+        <footer class="d-flex justify-content-between align-items-center mt-4">
+            <h2><strong>Total: @Html.DisplayFor(model => model.ValorTotal)</strong></h2>
+            <div class="d-flex align-items-center">
+                <label class="form-label me-2 mb-0">Valor Recebido: R$ </label>
+                <input type="text" name="valorRecebido" id="valorRecebido" value="@Html.DisplayFor(model => model.ValorTotal)" class="form-control" style="width: 150px;" />
+            </div>
+        </footer>
+
+        <div class="d-flex justify-content-end mt-4">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal" id="btnMostrarModal">
+                Confirmar
+            </button>
+        </div>
+    }
+    else
+    {
+        <p class="text-center text-muted">Nenhum produto adicionado.</p>
+    }
+
+    @if (Model != null)
+    {
+        <form asp-action="Finish">
+            <div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="myModalLabel">Confirmação de Pagamento</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <input asp-for="@Model.Data" type="hidden" value="@DateTime.Now" />
+                            <input asp-for="@Model.Id" type="hidden" value="@Model.Id" />
+
+                            <h4>Valor Total: R$ @Html.DisplayFor(model => model.ValorTotal)</h4>
+                            <h4>Valor Recebido: R$ <span id="valorRecebidoModal"></span></h4>
+                            <h4><strong>Troco: R$ <span id="trocoModal"></span></strong></h4>
+
+                            <div class="mb-3">
+                                <label class="form-label">Método de pagamento:</label>
+                                <select asp-for="@Model.MetodoPagamento" asp-items="@Html.GetEnumSelectList<Padaria.Models.Enums.MetodoPagamento>()" class="form-select"></select>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Fechar</button>
+                            <button type="submit" class="btn btn-success" id="btnFinalizar">Finalizar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    }
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#valorRecebido').mask('000.000.000.000.000,00', { reverse: true });
+        });
+
+        document.getElementById('btnMostrarModal').addEventListener('click', function () {
+            var valorRecebido = parseFloat(document.getElementById('valorRecebido').value.replace(',', '.'));
+            var valorTotal = parseFloat('@Model.ValorTotal'.replace(',', '.'));
+
+            document.getElementById('valorRecebidoModal').textContent = valorRecebido.toFixed(2).replace('.', ',');
+            document.getElementById('trocoModal').textContent = (valorRecebido - valorTotal).toFixed(2).replace('.', ',');
+        });
+
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'F1') {
+                event.preventDefault();
+                document.getElementById('btnMostrarModal').click();
+            }
+        });
+    </script>
+}

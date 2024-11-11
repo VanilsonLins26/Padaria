@@ -32,7 +32,7 @@ namespace Padaria.Services
 
         public async Task<Cliente> FindByIdAsync(int id)
         {
-            var cliente = await _context.Cliente.Include(c => c.Encomendas.OrderByDescending(e => e.Data)).FirstOrDefaultAsync(c => c.Id == id);
+            var cliente = await _context.Cliente.Include(c => c.Encomendas.OrderByDescending(e => e.Data)).ThenInclude(e => e.Produtos).FirstOrDefaultAsync(c => c.Id == id);
             
             return cliente;
         }
@@ -41,5 +41,7 @@ namespace Padaria.Services
         {
           return await _context.Cliente.Where(c => c.Nome.Contains(nome)).ToListAsync();
         }
+
+        
     }
 }

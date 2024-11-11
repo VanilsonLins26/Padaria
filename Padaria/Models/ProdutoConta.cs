@@ -8,22 +8,29 @@ namespace Padaria.Models
     {
         public int Id { get; set; }
         public int ProdutoId { get; set; }
+        public int ContaId { get; set; }
         public Produto Produto { get; set; }
-        public int Quantidade { get; set; }
-        public ICollection<Conta> Contas { get; set; } = new List<Conta>();
         [DataType(DataType.Currency)]
-        [Display(Name="Valor")]
-        public double Total { get; set; }
+        [Display(Name = "Valor unitário")]
+        public double ValorUnitario { get; set; }
+        public Conta Conta { get; set; }
+        public int Quantidade { get; set; }
+
+        [DataType(DataType.Currency)]
+        [Display(Name = "Valor")]
+        public double Total => Quantidade*ValorUnitario;
 
 
         public ProdutoConta() { }
 
-        public ProdutoConta(int id, Produto produto, int quantidade, double total)
+        public ProdutoConta(int id, Produto produto, int quantidade, Conta conta, double valorUnitario)
         {
             Produto = produto;
             Quantidade = quantidade;
             Id = id;
-            Total = total;
+            Conta = conta;  
+            ValorUnitario = valorUnitario;  
+            
         }
     }
 

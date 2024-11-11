@@ -16,7 +16,7 @@ namespace Padaria.Services
 
         public async Task<List<IGrouping<DateTime, Encomenda>>> GroupFindAsync()
         {
-          return await _context.Encomenda.Where(e => e.Status == Status.Andamento).Include(e => e.Cliente).OrderBy(e => e.Data).GroupBy(e => e.Data.Date).ToListAsync();
+          return await _context.Encomenda.Where(e => e.Status == StatusConta.Andamento).Include(e => e.Cliente).Include(e => e.Produtos).OrderBy(e => e.Data).GroupBy(e => e.Data.Date).ToListAsync();
         }
 
         public async Task AddAsync(Encomenda encomenda)
@@ -38,19 +38,19 @@ namespace Padaria.Services
 
         public async Task<List<Encomenda>> FindAllCompleted()
         {
-           return await _context.Encomenda.Where(e => e.Status == Status.Concluido).Include(e => e.Cliente).OrderByDescending(e => e.Data).ToListAsync();
+           return await _context.Encomenda.Where(e => e.Status == StatusConta.Concluido).Include(e => e.Cliente).Include(e => e.Produtos).OrderByDescending(e => e.Data).ToListAsync();
         }
 
         public async Task<List<Encomenda>> FindCompletedByDate(DateTime dataInicial, DateTime? dataFinal)
         {
             if (dataFinal != null)
             {
-               return await _context.Encomenda.Include(e => e.Cliente).Where(e => e.Data.Date >= dataInicial && e.Data.Date <= dataFinal && e.Status == Status.Concluido).OrderByDescending(e => e.Data).ToListAsync();
+               return await _context.Encomenda.Include(c => c.Produtos).Include(e => e.Cliente).Where(e => e.Data.Date >= dataInicial && e.Data.Date <= dataFinal && e.Status == StatusConta.Concluido).OrderByDescending(e => e.Data).ToListAsync();
 
             }
             else
             {
-                return await _context.Encomenda.Include(e => e.Cliente).Where(e => e.Data.Date == dataInicial && e.Status == Status.Concluido).OrderByDescending(e => e.Data).ToListAsync();
+                return await _context.Encomenda.Include(c => c.Produtos).Include(e => e.Cliente).Where(e => e.Data.Date == dataInicial && e.Status == StatusConta.Concluido).OrderByDescending(e => e.Data).ToListAsync();
 
 
             }

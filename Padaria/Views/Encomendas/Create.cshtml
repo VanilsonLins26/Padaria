@@ -1,115 +1,130 @@
 ﻿@model Padaria.Models.ViewModels.EncomendaViewModel
-
 @{
     ViewData["Title"] = "Nova Encomenda";
+    
+
+ 
 }
+
+
 
 <div class="container mt-5">
     <h1 class="text-center mb-4">@ViewData["Title"]</h1>
 
-   
-   
-    <form asp-action="SearchCliente" class="mb-4 d-flex align-items-center">
-        <input id="clienteInput" name="cliente" type="text" class="form-control me-2" placeholder="Digite o nome do cliente" style="width: 120px;" />
-        <button class="btn btn-info" type="submit" style="display:none">Procurar</button>
+    <form asp-action="AddProduto" class="mb-4">
+        <div class="d-flex align-items-center">
+            <input id="codigoInput" name="codigo" type="text" class="form-control me-2" placeholder="Código do produto" style="width: 200px;" autofocus />
+            <span class="text-danger ms-2">@TempData["ErrorMessage"]</span>
+            <button id="adicionarBtn" class="btn btn-info" type="submit" style="display:none;">Adicionar</button>
+        </div>
     </form>
 
-    <form asp-action="AddProduto">
-        <div class="row mb-4 d-flex align-items-center">
-            <div class="col-md-8 d-flex align-items-center">
-                <select asp-for="@Model.ClienteId" asp-items="@(new SelectList(Model.Clientes, "Id", "Nome"))" class="form-select me-2" style="width: auto;">
-                    <option value="">Selecione o cliente</option>
-                </select>
-
-                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#CriarEncomenda">
-                    Adicionar
-                </button>
-            </div>
-            <span asp-validation-for="@Model.ClienteId" class="text-danger"></span>
-        </div>
-
-
-
-
-        <div class="mb-4 d-flex align-items-center">
-            <input id="codigoInput" name="codigo" type="text" class="form-control me-2" placeholder="Código do produto" style="width: 150px;" autofocus/>
-            @if(TempData["ErrorMessage"] != null)
-            {
-                <span class="text-danger">@TempData["ErrorMessage"]</span>
-            }
-            <button id="adicionarBtn" class="btn btn-info" type="submit" style="display:none">Adicionar</button>
-        </div>
-
-        @if (Model.ProdutosConta.Count > 0)
-        {
-            <table class="table table-striped mt-3">
-                <thead>
-                    <tr>
-                        <th>Quantidade</th>
-                        <th>Produto</th>
-                        <th>Total</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @for (int i = 0; i < Model.ProdutosConta.Count; i++)
-                    {
-                        <tr>
-                            <td>
-                                <input type="text" asp-for="@Model.ProdutosConta[i].Quantidade" value="@Model.ProdutosConta[i].Quantidade" class="form-control quantidadeInput" style="width: 80px;" />
-                            </td>
-                            <td>@Html.DisplayFor(p => p.ProdutosConta[i].Produto.Nome)</td>
-                            <td>@Html.DisplayFor(p => p.ProdutosConta[i].Total)</td>
-                        </tr>
-                        <input type="hidden" asp-for="@Model.ProdutosConta[i].ProdutoId" value="@Model.ProdutosConta[i].ProdutoId" />
-                    }
-                </tbody>
-            </table>
-        }
-    </form>
-
-    @if (Model != null && ViewBag.Total != null)
+    @if (Model.Encomenda.Produtos.Count > 0)
     {
-        <form asp-action="Create">
-            
-            <div class="mb-3 d-flex align-items-center">
-                <label asp-for="@Model.Encomenda.Data" class="form-label me-2" style="margin-bottom: 0;">Entrega:</label>
-                <input asp-for="@Model.Encomenda.Data" class="form-control" style="width: 200px;" />
-                <span asp-validation-for="@Model.Encomenda.Data" class="text-danger"></span>
-                <input type="hidden" asp-for="@Model.Encomenda.DataPedido" value="@DateTime.Now" />
-                <input type="hidden" asp-for="@Model.Encomenda.MetodoPagamento" value="@Padaria.Models.Enums.MetodoPagamento.Debito" />
-                <input type="hidden" asp-for="@Model.Encomenda.Status" value="@Padaria.Models.Enums.Status.Andamento" />
-                <input type="hidden" asp-for="@Model.Encomenda.ClientId" value="@Model.Clientes.FirstOrDefault().Id" />
+        <table class="table table-striped mt-3">
+            <thead>
+                <tr>
+                    <th>Quantidade</th>
+                    <th>Produto</th>
+                    <th>Valor Unitário</th>
+                    <th>Total</th>
+                   
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Encomenda.Produtos)
+                {
+                    <form asp-action="ChangeQuantity" method="post">
+                    <tr>
+                        <td>
+                            <input name="Quantidade" class="form-control" value="@item.Quantidade" style="width: 80px;" />
+                            <input type="hidden" name="ProdutoId" value="@item.ProdutoId" />
+                            <input type="hidden" name="Id" value="@item.Id" />
+                            <input type="hidden" name="ValorUnitario" value="@item.ValorUnitario" />
+                            <input type="hidden" name="ContaId" value="@item.ContaId" />
+                        </td>
+                        <td>@Html.DisplayFor(modelitem => item.Produto.Nome)</td>
+                        <td>@Html.DisplayFor(modelitem => item.ValorUnitario)</td>
+                        <td>@Html.DisplayFor(modelitem => item.Total)</td>
+                        
+                    </tr>
+                    </form>
+                }
+            </tbody>
+        </table>
+    }
+
+    @if (Model.Encomenda.Produtos.Any())
+    {
+        <form asp-action="Finish" class="mt-4">
+
+            <div class="mb-3">
+                <strong style="font-size: 1.5rem; font-weight: bold;">
+                    Valor a receber: R$ @((Model.Encomenda.ValorTotal - (Model.Encomenda.ValorAntecipado)).ToString("F2"))
+                </strong>
+
+            </div>
+            <div class="row mb-4">
+                <div class="col-md-8">
+                    <div class="d-flex align-items-center">
+                        @if (Model.Encomenda.Status == Padaria.Models.Enums.StatusConta.NaoFinalizado)
+                        {
+                            <select id="pessoa" asp-for="@Model.Encomenda.ClienteId" class="form-control" placeholder="Escolha uma pessoa">
+
+                                <option value="">Selecione...</option>
+                            </select>
+                            <button type="button" class="btn btn-outline-primary ms-2" data-bs-toggle="modal" data-bs-target="#CriarEncomenda">Adicionar Cliente</button>
+                        }
+                        else
+                        {
+                            <label>Cliente: @Model.Encomenda.Cliente.Nome</label>
+                            <input type="hidden" asp-for="@Model.Encomenda.ClienteId" />
+                        }
+                        
+                    </div>
+
+                   
+                    <div class="text-danger mt-1">
+                        <span asp-validation-for="@Model.Encomenda.ClienteId"></span>
+                    </div>
+                </div>
             </div>
 
-            <div class="mb-3 d-flex align-items-center">
-                
-                <input asp-for="@Model.Encomenda.Obs" class="form-control" placeholder="Insira alguma observação, se necessário" />
+
+            <div class="mb-3">
+                <label asp-for="@Model.Encomenda.Data" class="form-label">Data de Entrega:</label>
+                @if (Model.Encomenda.Status == Padaria.Models.Enums.StatusConta.NaoFinalizado)
+                {
+                    <input asp-for="@Model.Encomenda.Data" class="form-control" value ="" style="width: 200px;"/>
+                }
+                else
+                {
+                    <input asp-for="@Model.Encomenda.Data" class="form-control" style="width: 200px;" />
+                }
+
+                    <span asp-validation-for="@Model.Encomenda.Data" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="@Model.Encomenda.Obs" class="form-label">Observação:</label>
+                <input asp-for="@Model.Encomenda.Obs" class="form-control" placeholder="Observação (opcional)" />
                 <span asp-validation-for="@Model.Encomenda.Obs" class="text-danger"></span>
             </div>
 
-            <div class="mb-3 d-flex align-items-center">
-                <label asp-for="@Model.Encomenda.ValorAntecipado" class="form-label me-2" style="margin-bottom: 0;">Valor antecipado: R$</label>
-                <input type="text" asp-for="@Model.Encomenda.ValorAntecipado" id="valorParcial" class="form-control" value="0.00" style="width: 80px;" />
+            <div class="mb-3">
+                <label asp-for="@Model.Encomenda.ValorAntecipado" class="form-label">Valor Antecipado (R$):</label>
+
+                <input type="text" asp-for="@Model.Encomenda.ValorAntecipado" id="valorParcial" class="form-control" value="@Model.Encomenda.ValorAntecipado.ToString("F2")" style="width: 150px;" />
                 <span asp-validation-for="@Model.Encomenda.ValorAntecipado" class="text-danger"></span>
             </div>
+            <div class="mb-3">
+                <label asp-for="@Model.Encomenda.Desconto" class="form-label">Desconto (R$):</label>
 
-            <div class="mb-3 d-flex align-items-center">
-                <label class="form-label me-2" style="margin-bottom: 0;">Total: R$</label>
-                <input type="text" asp-for="@Model.Encomenda.ValorTotal" id="total" class="form-control" value="@ViewBag.Total.ToString("F2")" style="width: 80px;" />
-                <span asp-validation-for="@Model.Encomenda.ValorTotal" class="text-danger"></span>
+                <input type="text" asp-for="@Model.Encomenda.Desconto" id="desconto" class="form-control" value="@Model.Encomenda.Desconto.ToString("F2")" style="width: 150px;" />
+                <span asp-validation-for="@Model.Encomenda.Desconto" class="text-danger"></span>
             </div>
 
-            @for (int i = 0; i < Model.ProdutosConta.Count; i++)
-            {
-                
-                <input type="hidden" asp-for="@Model.Encomenda.Produtos[i].Quantidade" value="@Model.ProdutosConta[i].Quantidade" />              
-                <input type="hidden" asp-for="@Model.Encomenda.Produtos[i].Total" value="@Model.ProdutosConta[i].Total" />
-
-                <input type="hidden" asp-for="@Model.Encomenda.Produtos[i].Produto.Id" value="@Model.ProdutosConta[i].ProdutoId" />
-                <input type="hidden" asp-for="@Model.Encomenda.Produtos[i].Produto.Codigo" value="@Model.ProdutosConta[i].Produto.Codigo" />
-                <input type="hidden" asp-for="@Model.Encomenda.Produtos[i].Produto.Nome" value="@Model.ProdutosConta[i].Produto.Nome" />
-                
-            }
+            
 
             <button type="submit" class="btn btn-success">Finalizar</button>
         </form>
@@ -123,20 +138,20 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form asp-action="Create" asp-controller="Clientes">
+                    <form asp-action="CreateClient">
                         <div class="mb-3">
-                            <label asp-for="@Model.Cliente.Nome" class="form-label">Nome:</label>
-                            <input asp-for="@Model.Cliente.Nome" class="form-control" placeholder="Digite o nome do cliente" style="width: 150px;" />
-                            <span asp-validation-for="@Model.Cliente.Nome" class="text-danger"></span>
+                            <label class="form-label">Nome:</label>
+                            <input name="Nome" class="form-control" placeholder="Nome do cliente" style="width: 100%;" />
+                            <span asp-validation-for="@Model.Encomenda.Cliente.Nome" class="text-danger"></span>
                         </div>
                         <div class="mb-3">
-                            <label asp-for="@Model.Cliente.Contato" class="form-label">Contato:</label>
-                            <input asp-for="@Model.Cliente.Contato" class="form-control" id="telefone" placeholder="Digite o número do cliente" style="width: 150px;" />
-                            <span asp-validation-for="@Model.Cliente.Contato" class="text-danger"></span>
+                            <label class="form-label">Contato:</label>
+                            <input name="Contato" class="form-control" id="telefone" placeholder="Número do cliente" style="width: 100%;" />
+                            <span asp-validation-for="@Model.Encomenda.Cliente.Contato" class="text-danger"></span>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-                            <button type="submit" class="btn btn-primary">Salvar alterações</button>
+                            <button type="submit" class="btn btn-primary">Salvar</button>
                         </div>
                     </form>
                 </div>
@@ -147,26 +162,56 @@
 
 @section scripts {
     
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/selectize/dist/css/selectize.default.css">
+    <script src="https://cdn.jsdelivr.net/npm/selectize/dist/js/standalone/selectize.min.js"></script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
     <script>
         $(document).ready(function () {
             $('#telefone').mask('(00) 00000-0000');
-            $('#total').mask('000.000.000.000.000,00', { reverse: true });
             $('#valorParcial').mask('000.000.000.000.000,00', { reverse: true });
+            $('#desconto').mask('000.000.000.000.000,00', { reverse: true });
 
-           
             $('#codigoInput, .quantidadeInput').on('keypress', function (e) {
                 if (e.key === 'Enter') {
-                    e.preventDefault(); 
-                    $('#adicionarBtn').click(); 
+                    e.preventDefault();
+                    $('#adicionarBtn').click();
                 }
             });
         });
+    </script>
+
+    <script>
+        $('#pessoa').selectize({
+            create: false   ,  // Permite criar novos itens
+            load: function (query, callback) {
+                // Realiza a pesquisa via AJAX
+                $.ajax({
+                    url: '@Url.Action("BuscarPessoas", "Encomendas")',
+                    data: { term: query },
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (res) {
+                        callback(res.map(item => ({ value: item.id, text: item.text })));
+                    },
+                    error: function () {
+                        callback([]);
+                    }
+                });
+            },
+            placeholder: 'Digite para buscar...',
+            closeAfterSelect: true, 
+        });
+
         
     </script>
 
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.validate/1.19.3/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.validate.unobtrusive/3.0.0/jquery.validate.unobtrusive.min.js"></script>
     <script src="@Url.Content("~/js/jquery.validate.pt-BR.js")"></script>
 }

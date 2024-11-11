@@ -1,76 +1,103 @@
-﻿@model Encomenda;
+﻿@model Encomenda
 
 @{
-    ViewData["Title"] = "Detalhes";
+    ViewData["Title"] = "Detalhes da Encomenda";
 }
 
 <div class="container mt-5">
     <h1 class="text-center mb-4">@ViewData["Title"]</h1>
 
     <div class="row mb-4">
-        <div class="col-sm-12">
+        <div class="col-12">
             <div class="alert alert-primary" role="alert">
-                <h4 class="mb-0">Conta n° @Model.Id</h4>
+                <h4 class="mb-0">Detalhes da Conta n° @Model.Id</h4>
             </div>
         </div>
     </div>
 
     <hr />
 
+    <!-- Informações da Encomenda -->
     <div class="row mb-4">
-        <div class="col-sm-6">
+        <div class="col-md-6">
             <h5>Informações da Encomenda</h5>
             <dl class="row">
-                <dt class="col-sm-5 fw-bold">Pedido feito: </dt>
+                <dt class="col-sm-5 fw-bold">Pedido feito:</dt>
                 <dd class="col-sm-7">@Html.DisplayFor(model => model.DataPedido)</dd>
-                <dt class="col-sm-5 fw-bold">Entrega: </dt>
+
+                <dt class="col-sm-5 fw-bold">Entrega:</dt>
                 <dd class="col-sm-7">@Html.DisplayFor(model => model.Data)</dd>
+
                 <dt class="col-sm-5 fw-bold">@Html.DisplayNameFor(model => model.Cliente.Nome)</dt>
                 <dd class="col-sm-7">@Html.DisplayFor(model => model.Cliente.Nome) - @Html.DisplayFor(model => model.Cliente.Contato)</dd>
+
                 <dt class="col-sm-5 fw-bold">@Html.DisplayNameFor(model => model.Status)</dt>
                 <dd class="col-sm-7">@Html.DisplayFor(model => model.Status)</dd>
-                <dt class="col-sm-5 fw-bold">@Html.DisplayNameFor(model => model.MetodoPagamento)</dt>
-                <dd class="col-sm-7">@Html.DisplayFor(model => model.MetodoPagamento)</dd>
+
                 <dt class="col-sm-5 fw-bold">@Html.DisplayNameFor(model => model.Obs)</dt>
                 <dd class="col-sm-7">@Html.DisplayFor(model => model.Obs)</dd>
+
+                <dt class="col-sm-5 fw-bold">@Html.DisplayNameFor(model => model.MetodoPagamento)</dt>
+                <dd class="col-sm-7">@Html.DisplayFor(model => model.MetodoPagamento)</dd>
             </dl>
         </div>
     </div>
 
-    <table class="table table-striped table-hover">
-        <thead class="table-dark">
-            <tr>
-                <th>@Html.DisplayNameFor(model => model.Produtos.FirstOrDefault().Quantidade)</th>
-                <th>Produto</th>
-                <th>@Html.DisplayNameFor(model => model.Produtos.FirstOrDefault().Total)</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model.Produtos)
-            {
+    <!-- Tabela de Produtos -->
+    <div class="table-responsive mb-4">
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
                 <tr>
-                    <td>@Html.DisplayFor(modelItem => item.Quantidade)</td>
-                    <td>@Html.DisplayFor(modelItem => item.Produto.Nome)</td>
-                    <td>@Html.DisplayFor(modelItem => item.Total)</td>
+                    <th>Quantidade</th>
+                    <th>Produto</th>
+                    <th>Total</th>
                 </tr>
-            }
-        </tbody>
-        <tfoot>
-            <tr class="table-dark">
-                <td colspan="2" class="text-end"><strong>Valor Total:</strong></td>
-                <td>@Html.DisplayFor(model => model.ValorTotal)</td>
-            </tr>
-        </tfoot>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Produtos)
+                {
+                    <tr>
+                        <td>@Html.DisplayFor(modelItem => item.Quantidade)</td>
+                        <td>@Html.DisplayFor(modelItem => item.Produto.Nome)</td>
+                        <td>@Html.DisplayFor(modelItem => item.Total)</td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                @if (Model.Desconto != 0)
+                {
+                    <tr class="table-dark">
+                        <td colspan="2" class="text-end"><strong>Desconto:</strong></td>
+                        <td>- @Html.DisplayFor(model => model.Desconto)</td>
+                    </tr>
+                }
+                <tr class="table-dark">
+                    <td colspan="2" class="text-end"><strong>Valor Total:</strong></td>
+                    <td>@Html.DisplayFor(model => model.ValorTotal)</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
 
+    <!-- Botão de Navegação -->
     <div class="text-center mt-3">
-        @if (Model.Status == Padaria.Models.Enums.Status.Andamento)
+        @if (Model.Status == Padaria.Models.Enums.StatusConta.Andamento)
         {
-            <a asp-action="Index" class="btn btn-secondary btn-lg">Voltar</a>
+            <a asp-action="Index" class="btn btn-lg btn-secondary">
+                <i class="bi bi-arrow-left-circle"></i> Voltar
+            </a>
         }
         else
         {
-            <a asp-action="Completed" class="btn btn-secondary btn-lg">Voltar</a>
+            <a asp-action="Completed" class="btn btn-lg btn-secondary">
+                <i class="bi bi-arrow-left-circle"></i> Voltar
+            </a>
         }
     </div>
 </div>
+
+@* Adicione o Bootstrap Icons para ícones no botão *@
+@section Scripts
+{
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.js"></script>
+}

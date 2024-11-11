@@ -5,24 +5,23 @@
 namespace Padaria.Migrations
 {
     /// <inheritdoc />
-    public partial class AddMetodoPagamento : Migration
+    public partial class Desconto : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<int>(
-                name: "MetodoPagamento",
+            migrationBuilder.AddColumn<double>(
+                name: "Desconto",
                 table: "Conta",
-                type: "int",
-                nullable: false,
-                defaultValue: 0);
+                type: "double",
+                nullable: true);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "MetodoPagamento",
+                name: "Desconto",
                 table: "Conta");
         }
     }

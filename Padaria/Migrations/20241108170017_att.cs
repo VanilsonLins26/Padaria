@@ -5,14 +5,14 @@
 namespace Padaria.Migrations
 {
     /// <inheritdoc />
-    public partial class AttProdutosConta2 : Migration
+    public partial class att : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<double>(
-                name: "ValorTotal",
-                table: "Conta",
+                name: "ValorUnitario",
+                table: "ProdutosConta",
                 type: "double",
                 nullable: false,
                 defaultValue: 0.0);
@@ -22,8 +22,8 @@ namespace Padaria.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "ValorTotal",
-                table: "Conta");
+                name: "ValorUnitario",
+                table: "ProdutosConta");
         }
     }
 }

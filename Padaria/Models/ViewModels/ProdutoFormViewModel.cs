@@ -4,7 +4,7 @@ namespace Padaria.Models.ViewModels
 {
     public class ProdutoFormViewModel
     {
-        public List<ProdutoConta> Produtos { get; set; }
+        public ProdutoConta Produto { get; set; }
         public Conta Conta { get; set; }
 
 

@@ -43,17 +43,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @for (int i = 0; i < Model.Produtos.Count; i++)
-                    {
-                        <tr>
-                            <td>
-                                <input type="text" asp-for="@Model.Produtos[i].Quantidade" value="@Model.Produtos[i].Quantidade" class="form-control quantidadeInput" style="width: 80px;" readonly/>
-                            </td>
-                            <td>@Html.DisplayFor(p => p.Produtos[i].Produto.Nome)</td>
-                            <td>@Html.DisplayFor(p => p.Produtos[i].Total)</td>
-                        </tr>
-                        <input type="hidden" asp-for="@Model.Produtos[i].ProdutoId" value="@Model.Produtos[i].ProdutoId" />
-                    }
+                   
                 </tbody>
             </table>
         
@@ -69,8 +59,8 @@
                 <span asp-validation-for="@Model.Data" class="text-danger"></span>
                 <input type="hidden" asp-for="@Model.DataPedido" value="@DateTime.Now" />
                 <input type="hidden" asp-for="@Model.MetodoPagamento" value="@Padaria.Models.Enums.MetodoPagamento.Debito" />
-                <input type="hidden" asp-for="@Model.Status" value="@Padaria.Models.Enums.Status.Andamento" />
-                <input type="hidden" asp-for="@Model.ClientId" value="@Model.ClientId" />
+                <input type="hidden" asp-for="@Model.Status" value="@Padaria.Models.Enums.StatusConta.Andamento" />
+                <input type="hidden" asp-for="@Model.ClienteId" value="@Model.ClienteId" />
             </div>
 
             <div class="mb-3 d-flex align-items-center">
